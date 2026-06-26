@@ -9,7 +9,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+      <head>
         {/* Inline script to prevent FOUC (Flash of Unstyled Content) on initial load */}
         <script
           dangerouslySetInnerHTML={{
@@ -25,6 +25,8 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
+      </head>
+      <body suppressHydrationWarning>
         <ThemeToggle />
         {children}
       </body>
