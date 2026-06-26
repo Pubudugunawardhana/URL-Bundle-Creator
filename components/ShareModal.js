@@ -32,23 +32,7 @@ export default function ShareModal({ bundle, onClose }) {
     URL.revokeObjectURL(url);
   };
 
-  const exportMarkdown = () => {
-    let md = `# ${bundle.name}\n\n`;
-    if (bundle.description) md += `${bundle.description}\n\n`;
-    bundle.links.forEach(l => {
-      md += `### [${l.title}](${l.url})\n`;
-      if (l.note) md += `**Note:** ${l.note}\n`;
-      if (l.description) md += `> ${l.description}\n`;
-      md += '\n';
-    });
-    const blob = new Blob([md], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${bundle.name}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+
 
   const exportTXT = () => {
     let txt = `${bundle.name}\n================\n${bundle.description || ''}\n\n`;
@@ -107,9 +91,7 @@ export default function ShareModal({ bundle, onClose }) {
             <button className="btn btn-outline" onClick={exportCSV}>
               <Download size={18} /> Export CSV
             </button>
-            <button className="btn btn-outline" onClick={exportMarkdown}>
-              <Download size={18} /> Export Markdown
-            </button>
+
             <button className="btn btn-outline" onClick={exportTXT}>
               <Download size={18} /> Export TXT
             </button>
