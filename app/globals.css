@@ -12,6 +12,34 @@
   --accent-glow: rgba(99, 102, 241, 0.3);
   --danger-color: #ef4444;
   --success-color: #10b981;
+  --text-gradient: linear-gradient(to right, #ffffff, #a1a1aa);
+  
+  /* UI elements */
+  --input-bg: rgba(0, 0, 0, 0.2);
+  --input-bg-dark: rgba(0, 0, 0, 0.4);
+  --hover-bg: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme='light'] {
+  --bg-color: #f8fafc;
+  --bg-gradient: radial-gradient(circle at top right, #f1f5f9 0%, #e2e8f0 100%);
+  --card-bg: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent-color: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-glow: rgba(79, 70, 229, 0.2);
+  --danger-color: #dc2626;
+  --success-color: #059669;
+  --text-gradient: linear-gradient(to right, #1e293b, #64748b);
+
+  /* UI elements */
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --input-bg-dark: rgba(0, 0, 0, 0.05);
+  --hover-bg: rgba(0, 0, 0, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 * {

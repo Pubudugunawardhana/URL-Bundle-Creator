@@ -76,7 +76,7 @@ export default function ShareModal({ bundle, onClose }) {
       <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Your bundle "{bundle.name}" is ready to share.</p>
 
       {/* URL Copy Box */}
-      <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.4)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '0.5rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg-dark)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '0.5rem', marginBottom: '2rem' }}>
         <input 
           type="text" 
           readOnly 

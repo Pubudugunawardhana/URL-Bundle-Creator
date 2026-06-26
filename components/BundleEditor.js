@@ -1,68 +1,71 @@
 'use client';
 import { useState } from 'react';
-import { GripVertical, Trash2, Link as LinkIcon, Image as ImageIcon, MessageSquare, Plus, Loader2, Edit3, Check } from 'lucide-react';
+import { GripVertical, Trash2, Link as LinkIcon, Plus, Loader2, ArrowLeft, Edit3 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
-export default function BundleEditor({ onSave }) {
+export default function BundleEditor({ onSave, onCancel }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [links, setLinks] = useState([]);
-  const [newUrl, setNewUrl] = useState('');
   const [isFetching, setIsFetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const fetchMetadata = async (url) => {
+  const handleAddNewLink = () => {
+    setLinks(prev => [...prev, {
+      id: Date.now().toString(),
+      url: '',
+      title: '',
+      description: '',
+      favicon: '',
+      note: '',
+      isEditing: true
+    }]);
+  };
+
+  const handleUrlBlur = async (id, url) => {
+    if (!url.trim()) return;
+    
+    // Basic validation
+    let validUrl = url;
+    if (!/^https?:\/\//i.test(validUrl)) {
+      validUrl = 'https://' + validUrl;
+    }
+
+    const link = links.find(l => l.id === id);
+    // Only fetch if title is empty or if we want to overwrite
+    if (link && link.title && link.url === validUrl) return;
+
     setIsFetching(true);
     try {
-      // Basic URL validation
-      let validUrl = url;
-      if (!/^https?:\/\//i.test(validUrl)) {
-        validUrl = 'https://' + validUrl;
-      }
-      
       const res = await fetch(`/api/metadata?url=${encodeURIComponent(validUrl)}`);
       const data = await res.json();
       
       if (res.ok) {
-        setLinks(prev => [...prev, {
-          id: Date.now().toString(),
+        setLinks(prev => prev.map(l => l.id === id ? {
+          ...l,
           url: validUrl,
-          title: data.title || validUrl,
-          description: data.description || '',
+          title: l.title || data.title || validUrl,
+          description: l.description || data.description || '',
           favicon: data.favicon || '',
-          note: ''
-        }]);
+          isEditing: false
+        } : l));
       } else {
-        // Fallback if fetch fails
-        setLinks(prev => [...prev, {
-          id: Date.now().toString(),
-          url: validUrl,
-          title: validUrl,
-          description: '',
-          favicon: '',
-          note: ''
-        }]);
+        updateLink(id, 'url', validUrl);
       }
     } catch (e) {
       console.error(e);
+      updateLink(id, 'url', validUrl);
     } finally {
       setIsFetching(false);
-      setNewUrl('');
     }
-  };
-
-  const handleAddLink = (e) => {
-    e.preventDefault();
-    if (!newUrl.trim()) return;
-    fetchMetadata(newUrl);
   };
 
   const removeLink = (id) => {
     setLinks(links.filter(l => l.id !== id));
   };
 
-  const updateLinkNote = (id, note) => {
-    setLinks(links.map(l => l.id === id ? { ...l, note } : l));
+  const updateLink = (id, field, value) => {
+    setLinks(links.map(l => l.id === id ? { ...l, [field]: value } : l));
   };
 
   const handleDragEnd = (result) => {
@@ -74,147 +77,269 @@ export default function BundleEditor({ onSave }) {
   };
 
   const handleSave = async () => {
-    if (!name || links.length === 0) return;
+    if (!name.trim()) {
+      alert("Please enter a Bundle Name.");
+      return;
+    }
+    if (links.length === 0) {
+      alert("Please add at least one link.");
+      return;
+    }
+    const validLinks = links.filter(l => l.url && l.url.trim() !== '').map(({ isEditing, ...rest }) => rest);
+    if (validLinks.length === 0) {
+      alert("Please make sure your links have valid URLs.");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const res = await fetch('/api/bundles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description, links })
+        body: JSON.stringify({ name, description, links: validLinks })
       });
       const data = await res.json();
       if (res.ok) {
         onSave(data);
       } else {
-        alert(data.error || 'Failed to save');
+        alert(data.error || 'Failed to save bundle.');
       }
     } catch (e) {
-      alert('Error saving bundle');
+      alert('Error saving bundle. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="glass animate-fade-in" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div className="glass animate-fade-in" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '700px', margin: '0 auto', textAlign: 'left' }}>
       
-      {/* Bundle Header info */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1.5rem' }}>
+        {onCancel && (
+          <button 
+            className="btn btn-icon" 
+            onClick={onCancel}
+            title="Go back"
+            style={{ padding: '0.5rem', background: 'var(--hover-bg)' }}
+          >
+            <ArrowLeft size={20} />
+          </button>
+        )}
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>URL Bundle Creator</h2>
+      </div>
+
+      {/* Bundle Meta info */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Bundle Name</label>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Bundle Name <span style={{ color: 'var(--danger-color)' }}>*</span></label>
           <input 
             type="text" 
             placeholder="e.g. Frontend Resources" 
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ fontSize: '1.5rem', fontWeight: 700, padding: '1rem' }}
+            style={{ fontSize: '1.2rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: name.trim() ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
           />
         </div>
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Description (Optional)</label>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Description</label>
           <textarea 
             placeholder="What are these links for?" 
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows={2}
+            rows={3}
+            style={{ padding: '1rem', background: 'var(--input-bg-dark)', resize: 'vertical' }}
           />
         </div>
       </div>
 
-      <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)' }} />
-
-      {/* Add Link Input */}
-      <form onSubmit={handleAddLink} style={{ display: 'flex', gap: '0.5rem' }}>
-        <input 
-          type="text" 
-          placeholder="Paste URL here (e.g. https://react.dev)" 
-          value={newUrl}
-          onChange={(e) => setNewUrl(e.target.value)}
-          disabled={isFetching}
-        />
-        <button type="submit" className="btn btn-primary" disabled={isFetching || !newUrl.trim()}>
-          {isFetching ? <Loader2 className="loader" /> : <><Plus size={20}/> Add Link</>}
+      <div style={{ marginTop: '1rem' }}>
+        <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--text-primary)', fontWeight: 600 }}>Links</h3>
+        <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)', marginBottom: '1.5rem' }} />
+        
+        {/* Top Add Link Button */}
+        <button 
+          className="btn btn-outline" 
+          onClick={handleAddNewLink}
+          style={{ width: '100%', padding: '1rem', borderStyle: 'dashed', marginBottom: '1.5rem' }}
+        >
+          <Plus size={20}/> Add Link
         </button>
-      </form>
 
-      {/* Draggable Link List */}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="links">
-          {(provided) => (
-            <div 
-              {...provided.droppableProps} 
-              ref={provided.innerRef}
-              style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minHeight: '100px' }}
-            >
-              {links.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)', border: '1px dashed var(--card-border)', borderRadius: '8px' }}>
-                  No links added yet. Paste a URL above to start!
-                </div>
-              ) : null}
+        {/* Draggable Link List */}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="links">
+            {(provided) => (
+              <div 
+                {...provided.droppableProps} 
+                ref={provided.innerRef}
+                style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+              >
+                {links.map((link, index) => (
+                  <Draggable key={link.id} draggableId={link.id} index={index}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="glass"
+                        style={{ 
+                          ...provided.draggableProps.style,
+                          padding: '1.5rem',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '1.25rem',
+                          background: 'var(--input-bg-dark)',
+                          border: '1px solid var(--card-border)'
+                        }}
+                      >
+                        <div {...provided.dragHandleProps} style={{ padding: '0.5rem', color: 'var(--text-secondary)', cursor: 'grab', marginTop: link.isEditing ? '0.5rem' : '0' }}>
+                          <GripVertical size={20} />
+                        </div>
 
-              {links.map((link, index) => (
-                <Draggable key={link.id} draggableId={link.id} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className="glass"
-                      style={{ 
-                        ...provided.draggableProps.style,
-                        padding: '1rem',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '1rem',
-                        background: 'rgba(0,0,0,0.3)'
-                      }}
-                    >
-                      <div {...provided.dragHandleProps} style={{ padding: '0.5rem', color: 'var(--text-secondary)', cursor: 'grab' }}>
-                        <GripVertical size={20} />
-                      </div>
-                      
-                      {link.favicon ? (
-                        <img src={link.favicon} alt="" style={{ width: 24, height: 24, borderRadius: 4, marginTop: 4 }} onError={(e) => { e.target.style.display='none'; }} />
-                      ) : (
-                        <LinkIcon size={24} color="var(--text-secondary)" style={{ marginTop: 4 }} />
-                      )}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          
+                          {link.isEditing ? (
+                            // --- EDIT MODE ---
+                            <>
+                              {/* URL Input */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--hover-bg)', padding: '0.5rem 1rem', borderRadius: '8px', border: !link.url.trim() ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid transparent' }}>
+                                {link.favicon ? (
+                                  <img src={link.favicon} alt="" style={{ width: 20, height: 20, borderRadius: 4 }} onError={(e) => { e.target.style.display='none'; }} />
+                                ) : (
+                                  <LinkIcon size={20} color="var(--text-secondary)" />
+                                )}
+                                <input 
+                                  type="text" 
+                                  placeholder="URL (e.g. https://react.dev) *" 
+                                  value={link.url}
+                                  onChange={(e) => updateLink(link.id, 'url', e.target.value)}
+                                  onBlur={(e) => handleUrlBlur(link.id, e.target.value)}
+                                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '1rem' }}
+                                />
+                                {isFetching && <Loader2 size={16} className="loader" style={{ marginLeft: 'auto' }} />}
+                              </div>
 
-                      <div style={{ flex: 1, overflow: 'hidden' }}>
-                        <div style={{ fontWeight: 600, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.title}</div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.url}</div>
-                        
-                        {/* Note Editor */}
-                        <div style={{ marginTop: '0.5rem' }}>
-                          <input 
-                            type="text" 
-                            placeholder="Add a note... (e.g. Official Docs)" 
-                            value={link.note}
-                            onChange={(e) => updateLinkNote(link.id, e.target.value)}
-                            style={{ padding: '0.5rem', fontSize: '0.9rem', background: 'transparent', borderBottom: '1px solid var(--card-border)', borderRadius: 0 }}
-                          />
+                              {/* Title Input */}
+                              <div>
+                                <input 
+                                  type="text" 
+                                  placeholder="Title (e.g. React Documentation)" 
+                                  value={link.title}
+                                  onChange={(e) => updateLink(link.id, 'title', e.target.value)}
+                                  style={{ background: 'transparent', border: '1px solid var(--card-border)' }}
+                                />
+                              </div>
+
+                              {/* Description / Note Input */}
+                              <div>
+                                <input 
+                                  type="text" 
+                                  placeholder="Description (e.g. Official React docs)" 
+                                  value={link.note || link.description}
+                                  onChange={(e) => updateLink(link.id, 'note', e.target.value)}
+                                  style={{ background: 'transparent', border: '1px solid var(--card-border)' }}
+                                />
+                              </div>
+
+                              {/* Actions */}
+                              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                <button 
+                                  className="btn btn-primary" 
+                                  onClick={() => updateLink(link.id, 'isEditing', false)}
+                                  style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+                                >
+                                  Done
+                                </button>
+                                <button 
+                                  type="button" 
+                                  className="btn-icon btn-danger" 
+                                  onClick={() => removeLink(link.id)} 
+                                  title="Remove Link"
+                                >
+                                  <Trash2 size={20} />
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            // --- VIEW MODE ---
+                            <>
+                              {/* Title & Favicon */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                {link.favicon ? (
+                                  <img src={link.favicon} alt="" style={{ width: 24, height: 24, borderRadius: 4 }} onError={(e) => { e.target.style.display='none'; }} />
+                                ) : (
+                                  <LinkIcon size={24} color="var(--text-secondary)" />
+                                )}
+                                <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                                  {link.title || link.url}
+                                </h4>
+                              </div>
+
+                              {/* URL */}
+                              <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', fontSize: '0.95rem', textDecoration: 'none', wordBreak: 'break-all' }}>
+                                {link.url}
+                              </a>
+
+                              {/* Description */}
+                              {(link.note || link.description) && (
+                                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                                  {link.note || link.description}
+                                </p>
+                              )}
+
+                              {/* Actions */}
+                              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                <button 
+                                  className="btn btn-outline" 
+                                  onClick={() => updateLink(link.id, 'isEditing', true)}
+                                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  className="btn btn-outline" 
+                                  onClick={() => removeLink(link.id)}
+                                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', color: 'var(--danger-color)', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </>
+                          )}
+
                         </div>
                       </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
-                      <button type="button" className="btn-icon btn-danger" onClick={() => removeLink(link.id)} title="Remove Link">
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+        {/* Bottom Add Link Button (only show if there are links) */}
+        {links.length > 0 && (
+          <button 
+            className="btn btn-outline" 
+            onClick={handleAddNewLink}
+            style={{ width: '100%', padding: '1rem', borderStyle: 'dashed', marginTop: '1.5rem' }}
+          >
+            <Plus size={20}/> Add Link
+          </button>
+        )}
+      </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+      <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)' }} />
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <button 
           className="btn btn-primary" 
           onClick={handleSave} 
-          disabled={isSaving || !name || links.length === 0}
-          style={{ fontSize: '1.1rem', padding: '1rem 2rem' }}
+          disabled={isSaving}
+          style={{ fontSize: '1.2rem', padding: '1rem 2rem', width: '100%' }}
         >
-          {isSaving ? <Loader2 className="loader" /> : 'Create Bundle'}
+          {isSaving ? <Loader2 className="loader" /> : 'Generate Bundle'}
         </button>
       </div>
     </div>
