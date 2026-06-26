@@ -72,7 +72,7 @@ export default async function BundlePage({ params }) {
             href={link.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="glass"
+            className="glass link-card"
             style={{ 
               display: 'flex', 
               padding: '1.5rem', 
@@ -80,14 +80,6 @@ export default async function BundlePage({ params }) {
               textDecoration: 'none', 
               color: 'inherit',
               transition: 'transform 0.2s, background 0.2s'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.background = 'var(--card-bg)';
             }}
           >
             {link.favicon ? (
