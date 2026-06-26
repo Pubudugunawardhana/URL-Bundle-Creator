@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Bundle {
+  id          String   @id @default(cuid())
+  shortId     String   @unique
+  name        String
+  description String?
+  links       Link[]
+  createdAt   DateTime @default(now())
+  views       Int      @default(0)
+}
+
+model Link {
+  id          String  @id @default(cuid())
+  url         String
+  title       String?
+  description String?
+  favicon     String?
+  note        String?
+  order       Int     @default(0)
+  bundleId    String
+  bundle      Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+}
