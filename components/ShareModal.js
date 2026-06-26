@@ -6,6 +6,7 @@ import Papa from 'papaparse';
 
 export default function ShareModal({ bundle, onClose }) {
   const [copied, setCopied] = useState(false);
+  const [textCopied, setTextCopied] = useState(false);
   
   // Construct the absolute URL (e.g., https://urlbundle.app/b/AbX92)
   const bundleUrl = typeof window !== 'undefined' ? `${window.location.origin}/b/${bundle.shortId}` : `/b/${bundle.shortId}`;
@@ -33,6 +34,21 @@ export default function ShareModal({ bundle, onClose }) {
   };
 
 
+
+  const copyAsText = () => {
+    let txt = `*${bundle.name}*\n\n`;
+    if (bundle.description) txt += `${bundle.description}\n\n`;
+    bundle.links.forEach((l, i) => {
+      txt += `${i + 1}. *${l.title || l.url}*\n${l.url}\n`;
+      if (l.note || l.description) txt += `_${l.note || l.description}_\n`;
+      txt += '\n';
+    });
+    txt += `*View Full Bundle:* ${bundleUrl}`;
+    
+    navigator.clipboard.writeText(txt);
+    setTextCopied(true);
+    setTimeout(() => setTextCopied(false), 2000);
+  };
 
   const exportTXT = () => {
     let txt = `${bundle.name}\n================\n${bundle.description || ''}\n\n`;
@@ -74,7 +90,7 @@ export default function ShareModal({ bundle, onClose }) {
           </button>
         </div>
 
-        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
           {/* QR Code */}
           <div style={{ background: 'white', padding: '1rem', borderRadius: '12px', display: 'inline-block' }}>
             <QRCodeSVG value={bundleUrl} size={150} level={"H"} />
@@ -85,6 +101,9 @@ export default function ShareModal({ bundle, onClose }) {
             <a href={bundleUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ justifyContent: 'center' }}>
               <ExternalLink size={18} /> Open Bundle
             </a>
+            <button className="btn btn-outline" onClick={copyAsText} style={{ justifyContent: 'center' }}>
+              {textCopied ? <Check size={18} /> : <Copy size={18} />} {textCopied ? 'Copied!' : 'Copy to Clipboard'}
+            </button>
             <button className="btn btn-outline" onClick={() => window.print()}>
               <Download size={18} /> Export PDF
             </button>
