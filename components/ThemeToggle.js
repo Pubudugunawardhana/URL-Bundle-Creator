@@ -28,7 +28,7 @@ export default function ThemeToggle() {
   return (
     <button 
       onClick={toggleTheme} 
-      className="btn btn-icon glass"
+      className="btn btn-icon glass no-print"
       style={{
         position: 'fixed',
         top: '1.5rem',
