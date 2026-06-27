@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { customAlphabet } from 'nanoid';
+import crypto from 'crypto';
 
 // Alphabet that avoids confusing characters
 const nanoid = customAlphabet('346789ABCDEFGHJKLMNPQRTUVWXYabcdefghijkmnopqrstuvwxyz', 5);
@@ -8,7 +9,7 @@ const nanoid = customAlphabet('346789ABCDEFGHJKLMNPQRTUVWXYabcdefghijkmnopqrstuv
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name, description, links } = body;
+    const { name, description, links, password } = body;
 
     if (!name || !links || !Array.isArray(links) || links.length === 0) {
       return NextResponse.json({ error: 'Bundle name and at least one link are required.' }, { status: 400 });
@@ -16,11 +17,17 @@ export async function POST(request) {
 
     const shortId = nanoid();
 
+    let hashedPassword = null;
+    if (password && password.trim() !== '') {
+      hashedPassword = crypto.createHash('sha256').update(password.trim()).digest('hex');
+    }
+
     const bundle = await prisma.bundle.create({
       data: {
         shortId,
         name,
         description: description || null,
+        password: hashedPassword,
         links: {
           create: links.map((link, index) => ({
             url: link.url,
