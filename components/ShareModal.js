@@ -29,7 +29,9 @@ export default function ShareModal({ bundle, onClose }) {
     const a = document.createElement('a');
     a.href = url;
     a.download = `${bundle.name}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
@@ -51,18 +53,24 @@ export default function ShareModal({ bundle, onClose }) {
   };
 
   const exportTXT = () => {
-    let txt = `${bundle.name}\n================\n${bundle.description || ''}\n\n`;
+    let txt = `${bundle.name}\n================\n`;
+    if (bundle.description) txt += `${bundle.description}\n\n`;
+    
     bundle.links.forEach((l, i) => {
-      txt += `${i + 1}. ${l.title}\n${l.url}\n`;
-      if (l.note) txt += `Note: ${l.note}\n`;
+      txt += `${i + 1}. ${l.title || l.url}\n${l.url}\n`;
+      if (l.note || l.description) txt += `Note: ${l.note || l.description}\n`;
       txt += '\n';
     });
+    txt += `\nView Full Bundle: ${bundleUrl}`;
+    
     const blob = new Blob([txt], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `${bundle.name}.txt`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
