@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 export default function BundleEditor({ onSave, onCancel }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [password, setPassword] = useState('');
   const [links, setLinks] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -96,7 +97,7 @@ export default function BundleEditor({ onSave, onCancel }) {
       const res = await fetch('/api/bundles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description, links: validLinks })
+        body: JSON.stringify({ name, description, password, links: validLinks })
       });
       const data = await res.json();
       if (res.ok) {
@@ -150,6 +151,17 @@ export default function BundleEditor({ onSave, onCancel }) {
             rows={3}
             style={{ padding: '1rem', background: 'var(--input-bg-dark)', resize: 'vertical' }}
           />
+        </div>
+        <div>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Password (Optional)</label>
+          <input 
+            type="password" 
+            placeholder="Protect this bundle with a password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)' }}
+          />
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>If set, viewers will need this password to open the bundle.</p>
         </div>
       </div>
 

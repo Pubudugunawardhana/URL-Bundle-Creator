@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { Link as LinkIcon, ExternalLink, Calendar, Eye, Layers } from 'lucide-react';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+import PasswordPrompt from '@/components/PasswordPrompt';
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -33,6 +35,14 @@ export default async function BundlePage({ params }) {
 
   if (!bundle) {
     notFound();
+  }
+
+  const cookieStore = await cookies();
+  const passCookie = cookieStore.get(`bundle_pass_${id}`);
+  const hasAccess = !bundle.password || (passCookie && passCookie.value === bundle.password);
+
+  if (!hasAccess) {
+    return <PasswordPrompt bundleId={id} bundleName={bundle.name} />;
   }
 
   return (
