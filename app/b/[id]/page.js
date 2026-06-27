@@ -4,6 +4,7 @@ import { Link as LinkIcon, ExternalLink, Calendar, Eye, Layers, Clock } from 'lu
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import PasswordPrompt from '@/components/PasswordPrompt';
+import FaviconImage from '@/components/FaviconImage';
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -113,13 +114,7 @@ export default async function BundlePage({ params }) {
               transition: 'transform 0.2s, background 0.2s'
             }}
           >
-            {link.favicon ? (
-              <img src={link.favicon} alt="" style={{ width: 32, height: 32, borderRadius: 6, flexShrink: 0 }} onError={(e) => { e.target.style.display='none'; }} />
-            ) : (
-              <div style={{ width: 32, height: 32, borderRadius: 6, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <LinkIcon size={16} />
-              </div>
-            )}
+            <FaviconImage src={link.favicon} />
 
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
