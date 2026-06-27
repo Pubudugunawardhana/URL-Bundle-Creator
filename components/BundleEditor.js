@@ -7,6 +7,7 @@ export default function BundleEditor({ onSave, onCancel }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [links, setLinks] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -91,6 +92,10 @@ export default function BundleEditor({ onSave, onCancel }) {
       alert("Please make sure your links have valid URLs.");
       return;
     }
+    if (password && password !== confirmPassword) {
+      alert("Passwords do not match. Please check your password and try again.");
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -163,6 +168,19 @@ export default function BundleEditor({ onSave, onCancel }) {
           />
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>If set, viewers will need this password to open the bundle.</p>
         </div>
+        
+        {password && (
+          <div className="animate-fade-in">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Confirm Password <span style={{ color: 'var(--danger-color)' }}>*</span></label>
+            <input 
+              type="password" 
+              placeholder="Type your password again" 
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: confirmPassword === password ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
+            />
+          </div>
+        )}
       </div>
 
       <div style={{ marginTop: '1rem' }}>
