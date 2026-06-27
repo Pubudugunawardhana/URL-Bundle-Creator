@@ -22,17 +22,20 @@ Built with a premium **Glassmorphism** UI, it supports both **Dark Mode** and **
 
 - **🎨 Premium UI/UX:** Stunning glassmorphism design with fluid animations.
 - **🌗 Theme Toggle:** Seamlessly switch between Light and Dark modes (preference saved locally).
+- **🔒 Password Protection:** Secure your bundles with a password so only authorized users can view them.
+- **⏳ Auto Expiry / Self-Destruct:** Set bundles to automatically expire after 1 hour, 24 hours, or 7 days.
+- **📊 View Tracking:** Track how many times your bundle has been viewed.
 - **🤖 Smart Metadata Fetching:** Paste a link and instantly fetch the website's Title, Description, and Favicon.
 - **🔄 Drag & Drop:** Easily reorder your links before generating the bundle.
 - **📤 Export Anywhere:** Export your created bundles to **CSV**, **Markdown**, **TXT**, or **PDF**, or share them via QR Code.
-- **⚡ Fast & Secure:** Built on Next.js App Router with Prisma & SQLite for blazing fast performance.
+- **⚡ Fast & Secure:** Built on Next.js App Router with Prisma & PostgreSQL for blazing fast performance.
 - **🚫 No Signup Needed:** Create and share bundles instantly without creating an account.
 
 ## 🛠️ Tech Stack
 
 - **Framework:** [Next.js](https://nextjs.org/) (App Router)
 - **Styling:** Custom Vanilla CSS (Glassmorphism)
-- **Database:** SQLite
+- **Database:** PostgreSQL (Prisma Postgres / Vercel Postgres / Neon)
 - **ORM:** [Prisma](https://www.prisma.io/)
 - **Icons:** [Lucide React](https://lucide.dev/)
 - **Drag & Drop:** `@hello-pangea/dnd`
@@ -62,15 +65,10 @@ npm install
 
 ### 3. Environment Variables
 
-Create a `.env` file in the root directory. You can copy the provided example:
+Create a `.env` file in the root directory. You will need a PostgreSQL database URL (e.g., from Prisma Postgres, Neon, or Supabase):
 
-```bash
-cp .env.example .env
-```
-
-Ensure your `.env` file has the correct database path:
 ```env
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgres://user:password@hostname/dbname?sslmode=require"
 ```
 
 ### 4. Setup the Database
