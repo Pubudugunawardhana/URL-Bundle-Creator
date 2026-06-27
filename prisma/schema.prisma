@@ -13,6 +13,7 @@ model Bundle {
   name        String
   description String?
   password    String?
+  expiresAt   DateTime?
   links       Link[]
   createdAt   DateTime @default(now())
   views       Int      @default(0)
