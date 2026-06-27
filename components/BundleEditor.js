@@ -8,6 +8,7 @@ export default function BundleEditor({ onSave, onCancel }) {
   const [description, setDescription] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [expiresIn, setExpiresIn] = useState('none');
   const [links, setLinks] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -102,7 +103,7 @@ export default function BundleEditor({ onSave, onCancel }) {
       const res = await fetch('/api/bundles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description, password, links: validLinks })
+        body: JSON.stringify({ name, description, password, expiresIn, links: validLinks })
       });
       const data = await res.json();
       if (res.ok) {
@@ -157,20 +158,34 @@ export default function BundleEditor({ onSave, onCancel }) {
             style={{ padding: '1rem', background: 'var(--input-bg-dark)', resize: 'vertical' }}
           />
         </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Password (Optional)</label>
-          <input 
-            type="password" 
-            placeholder="Protect this bundle with a password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)' }}
-          />
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>If set, viewers will need this password to open the bundle.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Password (Optional)</label>
+            <input 
+              type="password" 
+              placeholder="Protect this bundle" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Self-Destruct (Optional)</label>
+            <select
+              value={expiresIn}
+              onChange={(e) => setExpiresIn(e.target.value)}
+              style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)', color: 'var(--text-primary)', width: '100%', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              <option value="none">Never</option>
+              <option value="1h">1 Hour</option>
+              <option value="24h">24 Hours</option>
+              <option value="7d">7 Days</option>
+            </select>
+          </div>
         </div>
         
         {password && (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in" style={{ marginTop: '-0.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Confirm Password <span style={{ color: 'var(--danger-color)' }}>*</span></label>
             <input 
               type="password" 

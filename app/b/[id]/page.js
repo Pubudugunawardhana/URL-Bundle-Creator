@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
-import { Link as LinkIcon, ExternalLink, Calendar, Eye, Layers } from 'lucide-react';
+import { Link as LinkIcon, ExternalLink, Calendar, Eye, Layers, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import PasswordPrompt from '@/components/PasswordPrompt';
@@ -35,6 +35,21 @@ export default async function BundlePage({ params }) {
 
   if (!bundle) {
     notFound();
+  }
+
+  // Check if expired
+  if (bundle.expiresAt && new Date() > new Date(bundle.expiresAt)) {
+    return (
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+        <div className="glass animate-fade-in" style={{ padding: '3rem', maxWidth: '450px', width: '100%', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger-color)', marginBottom: '1.5rem' }}>
+            <Clock size={32} />
+          </div>
+          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>Bundle Expired</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>This URL bundle has self-destructed and is no longer available.</p>
+        </div>
+      </div>
+    );
   }
 
   const cookieStore = await cookies();
@@ -72,6 +87,12 @@ export default async function BundlePage({ params }) {
             <LinkIcon size={16} />
             {bundle.links.length} links
           </div>
+          {bundle.expiresAt && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--danger-color)', background: 'rgba(239, 68, 68, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+              <Clock size={14} />
+              Expires {new Date(bundle.expiresAt).toLocaleDateString()}
+            </div>
+          )}
         </div>
       </div>
 

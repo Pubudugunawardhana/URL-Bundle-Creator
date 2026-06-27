@@ -9,7 +9,7 @@ const nanoid = customAlphabet('346789ABCDEFGHJKLMNPQRTUVWXYabcdefghijkmnopqrstuv
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name, description, links, password } = body;
+    const { name, description, links, password, expiresIn } = body;
 
     if (!name || !links || !Array.isArray(links) || links.length === 0) {
       return NextResponse.json({ error: 'Bundle name and at least one link are required.' }, { status: 400 });
@@ -22,12 +22,22 @@ export async function POST(request) {
       hashedPassword = crypto.createHash('sha256').update(password.trim()).digest('hex');
     }
 
+    let expiresAt = null;
+    if (expiresIn === '1h') {
+      expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    } else if (expiresIn === '24h') {
+      expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    } else if (expiresIn === '7d') {
+      expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    }
+
     const bundle = await prisma.bundle.create({
       data: {
         shortId,
         name,
         description: description || null,
         password: hashedPassword,
+        expiresAt,
         links: {
           create: links.map((link, index) => ({
             url: link.url,
