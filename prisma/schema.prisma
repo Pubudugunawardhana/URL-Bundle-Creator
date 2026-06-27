@@ -12,6 +12,7 @@ model Bundle {
   shortId     String   @unique
   name        String
   description String?
+  password    String?
   links       Link[]
   createdAt   DateTime @default(now())
   views       Int      @default(0)
