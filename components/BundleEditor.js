@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { GripVertical, Trash2, Link as LinkIcon, Plus, Loader2, ArrowLeft, Edit3 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import Toast from './Toast';
 
 export default function BundleEditor({ onSave, onCancel }) {
   const [name, setName] = useState('');
@@ -12,6 +13,11 @@ export default function BundleEditor({ onSave, onCancel }) {
   const [links, setLinks] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
+
+  const showToast = (message, type = 'error') => {
+    setToast({ show: true, message, type });
+  };
 
   const handleAddNewLink = () => {
     setLinks(prev => [...prev, {
@@ -81,20 +87,20 @@ export default function BundleEditor({ onSave, onCancel }) {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      alert("Please enter a Bundle Name.");
+      showToast("Please enter a Bundle Name.");
       return;
     }
     if (links.length === 0) {
-      alert("Please add at least one link.");
+      showToast("Please add at least one link.");
       return;
     }
     const validLinks = links.filter(l => l.url && l.url.trim() !== '').map(({ isEditing, ...rest }) => rest);
     if (validLinks.length === 0) {
-      alert("Please make sure your links have valid URLs.");
+      showToast("Please make sure your links have valid URLs.");
       return;
     }
     if (password && password !== confirmPassword) {
-      alert("Passwords do not match. Please check your password and try again.");
+      showToast("Passwords do not match. Please check your password and try again.");
       return;
     }
 
@@ -109,17 +115,25 @@ export default function BundleEditor({ onSave, onCancel }) {
       if (res.ok) {
         onSave(data);
       } else {
-        alert(data.error || 'Failed to save bundle.');
+        showToast(data.error || 'Failed to save bundle.');
       }
     } catch (e) {
-      alert('Error saving bundle. Please try again.');
+      showToast('Error saving bundle. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="glass animate-fade-in" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '700px', margin: '0 auto', textAlign: 'left' }}>
+    <>
+      {toast.show && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast({ ...toast, show: false })} 
+        />
+      )}
+      <div className="glass animate-fade-in" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '700px', margin: '0 auto', textAlign: 'left' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1.5rem' }}>
@@ -390,5 +404,6 @@ export default function BundleEditor({ onSave, onCancel }) {
         </button>
       </div>
     </div>
+    </>
   );
 }
