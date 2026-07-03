@@ -249,6 +249,7 @@ export default function BundleEditor({ onSave, onCancel }) {
                               {/* URL Input */}
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--hover-bg)', padding: '0.5rem 1rem', borderRadius: '8px', border: !link.url.trim() ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid transparent' }}>
                                 {link.favicon ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
                                   <img src={link.favicon} alt="" style={{ width: 20, height: 20, borderRadius: 4 }} onError={(e) => { e.target.style.display='none'; }} />
                                 ) : (
                                   <LinkIcon size={20} color="var(--text-secondary)" />
@@ -311,6 +312,7 @@ export default function BundleEditor({ onSave, onCancel }) {
                               {/* Title & Favicon */}
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                 {link.favicon ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
                                   <img src={link.favicon} alt="" style={{ width: 24, height: 24, borderRadius: 4 }} onError={(e) => { e.target.style.display='none'; }} />
                                 ) : (
                                   <LinkIcon size={24} color="var(--text-secondary)" />

@@ -7,6 +7,7 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line
     setMounted(true);
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {

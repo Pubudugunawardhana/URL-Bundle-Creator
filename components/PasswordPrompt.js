@@ -39,7 +39,7 @@ export default function PasswordPrompt({ bundleId, bundleName }) {
         
         <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>Protected Bundle</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-          "{bundleName}" requires a password to view its contents.
+          &quot;{bundleName}&quot; requires a password to view its contents.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

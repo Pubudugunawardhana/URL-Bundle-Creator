@@ -83,7 +83,7 @@ export default function ShareModal({ bundle, onClose }) {
         </button>
 
         <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--success-color)' }}>Bundle Created! 🎉</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Your bundle "{bundle.name}" is ready to share.</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Your bundle &quot;{bundle.name}&quot; is ready to share.</p>
 
         {/* URL Copy Box */}
         <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg-dark)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '0.5rem', marginBottom: '2rem' }}>
