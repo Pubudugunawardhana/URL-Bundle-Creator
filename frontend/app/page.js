@@ -61,27 +61,80 @@ export default function Home() {
         </header>
 
         {/* Mockup Dashboard Section */}
-        <section style={{ marginBottom: '8rem', position: 'relative', zIndex: 1 }}>
-          <div className="glass" style={{ padding: '0', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', border: '1px solid var(--card-border)' }}>
+        <section style={{ marginBottom: '8rem', position: 'relative', zIndex: 1, perspective: '1000px' }}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%', background: 'var(--accent-glow)', filter: 'blur(100px)', zIndex: -1 }}></div>
+          
+          <div className="glass" style={{ 
+            padding: '0', 
+            borderRadius: '20px', 
+            overflow: 'hidden', 
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--card-border)', 
+            background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.2) 100%)',
+            backdropFilter: 'blur(20px)',
+            transform: 'rotateX(2deg) rotateY(-1deg)',
+            transition: 'transform 0.5s ease',
+          }}>
             {/* Browser Header */}
-            <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid var(--card-border)' }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }}></div>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }}></div>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }}></div>
-              <div style={{ marginLeft: '1rem', background: 'var(--input-bg)', padding: '0.25rem 1rem', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--text-secondary)', flex: 1, textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Lock size={12} /> https://urlbundle.com/create
+            <div style={{ padding: '1.25rem', background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: '1px solid var(--card-border)' }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ff5f56', boxShadow: '0 0 5px #ff5f56' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ffbd2e', boxShadow: '0 0 5px #ffbd2e' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#27c93f', boxShadow: '0 0 5px #27c93f' }}></div>
               </div>
+              <div style={{ 
+                margin: '0 auto', 
+                background: 'rgba(0,0,0,0.3)', 
+                padding: '0.4rem 2rem', 
+                borderRadius: '99px', 
+                fontSize: '0.85rem', 
+                color: 'var(--text-secondary)',
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem',
+                border: '1px solid rgba(255,255,255,0.05)',
+                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)'
+              }}>
+                <Lock size={12} color="var(--success-color)" /> <span style={{ opacity: 0.8 }}>urlbundle.com/create</span>
+              </div>
+              <div style={{ width: '56px' }}></div> {/* Spacer for balance */}
             </div>
+            
             {/* Mockup Content */}
-            <div style={{ padding: '3rem', background: 'var(--card-bg)', textAlign: 'left', minHeight: '300px' }}>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>New Bundle</h3>
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                <div style={{ flex: 1, height: '48px', background: 'var(--input-bg)', borderRadius: '8px', border: '1px solid var(--card-border)' }}></div>
-                <div style={{ width: '100px', height: '48px', background: 'var(--text-primary)', borderRadius: '8px' }}></div>
+            <div style={{ padding: '3rem', textAlign: 'left', minHeight: '350px', background: 'rgba(0,0,0,0.1)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                <h3 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>New Bundle</h3>
+                <div style={{ background: 'var(--accent-color)', padding: '0.5rem 1.5rem', borderRadius: '8px', color: 'white', fontSize: '0.9rem', fontWeight: 600, boxShadow: '0 4px 15px var(--accent-glow)' }}>
+                  Save Bundle
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', opacity: 0.7 }}>
-                <div style={{ flex: 1, height: '48px', background: 'var(--input-bg)', borderRadius: '8px', border: '1px solid var(--card-border)' }}></div>
-                <div style={{ width: '100px', height: '48px', background: 'var(--text-primary)', borderRadius: '8px' }}></div>
+              
+              {/* Mock Input Row 1 */}
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', position: 'relative' }}>
+                <div style={{ flex: 1, height: '54px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', padding: '0 1rem', color: 'var(--text-secondary)' }}>
+                  <LinkIcon size={16} style={{ marginRight: '0.75rem', opacity: 0.5 }} />
+                  https://github.com/facebook/react
+                </div>
+                <div style={{ width: '120px', height: '54px', background: 'rgba(255,255,255,0.08)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+                  Edit
+                </div>
+              </div>
+
+              {/* Mock Input Row 2 */}
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
+                <div style={{ flex: 1, height: '54px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', padding: '0 1rem', color: 'var(--text-secondary)' }}>
+                  <LinkIcon size={16} style={{ marginRight: '0.75rem', opacity: 0.5 }} />
+                  https://nextjs.org/docs
+                </div>
+                <div style={{ width: '120px', height: '54px', background: 'rgba(255,255,255,0.08)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+                  Edit
+                </div>
+              </div>
+
+              {/* Mock Add Row */}
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', opacity: 0.6 }}>
+                <div style={{ flex: 1, height: '54px', background: 'rgba(255,255,255,0.01)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                  + Paste another URL here...
+                </div>
               </div>
             </div>
           </div>
