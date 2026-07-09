@@ -1,6 +1,8 @@
 import './globals.css';
+import Script from 'next/script';
 import ThemeToggle from '@/components/ThemeToggle';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { SessionProvider } from 'next-auth/react';
 
 export const metadata = {
@@ -12,27 +14,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Inline script to prevent FOUC (Flash of Unstyled Content) on initial load */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var savedTheme = localStorage.getItem('theme');
-                  if (savedTheme) {
-                    document.documentElement.setAttribute('data-theme', savedTheme);
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
       </head>
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <SessionProvider>
           <Navbar />
           <ThemeToggle />
-          {children}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {children}
+          </div>
+          <Footer />
         </SessionProvider>
       </body>
     </html>
