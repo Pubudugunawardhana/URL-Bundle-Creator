@@ -1,11 +1,31 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Layers, LayoutDashboard, LogOut, LogIn, UserPlus } from 'lucide-react';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
@@ -25,6 +45,9 @@ export default function Navbar() {
       alignItems: 'center',
       justifyContent: 'space-between',
       boxShadow: 'var(--glass-shadow)',
+      transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      transform: visible ? 'translateY(0)' : 'translateY(-150%)',
+      opacity: visible ? 1 : 0,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', color: 'var(--text-primary)', fontWeight: 700, fontSize: '1.2rem' }}>
