@@ -45,7 +45,14 @@ export default function SignupPage() {
         }),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type");
+      let data = {};
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(response.ok ? 'Unexpected response format.' : (text || 'Server error occurred. Please try again later.'));
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Something went wrong. Please try again.');

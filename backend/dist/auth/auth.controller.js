@@ -22,7 +22,13 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async signup(dto) {
-        return this.authService.signup(dto);
+        try {
+            return await this.authService.signup(dto);
+        }
+        catch (e) {
+            console.error('Signup API Error:', e);
+            return { error: true, message: e.message, stack: e.stack, name: e.name };
+        }
     }
     async validate(dto) {
         return this.authService.validateUser(dto);

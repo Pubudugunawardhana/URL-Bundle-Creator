@@ -9,7 +9,12 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() dto: SignupDto) {
-    return this.authService.signup(dto);
+    try {
+      return await this.authService.signup(dto);
+    } catch (e: any) {
+      console.error('Signup API Error:', e);
+      return { error: true, message: e.message, stack: e.stack, name: e.name };
+    }
   }
 
   @Post('auth/validate')
