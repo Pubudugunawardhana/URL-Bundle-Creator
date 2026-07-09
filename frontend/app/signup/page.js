@@ -9,6 +9,7 @@ export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -16,6 +17,17 @@ export default function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -100,6 +112,22 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Minimum 6 characters"
+                style={{ paddingLeft: '2.75rem' }}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Confirm Password</label>
+            <div style={{ position: 'relative' }}>
+              <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
                 style={{ paddingLeft: '2.75rem' }}
                 disabled={loading}
               />
