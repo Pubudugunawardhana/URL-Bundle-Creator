@@ -1,32 +1,21 @@
 {
-  "name": "url-bundle-creator",
+  "name": "url-bundle-creator-monorepo",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@11.11.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && prisma db push && next build",
-    "start": "next start",
-    "lint": "eslint",
-    "postinstall": "prisma generate"
-  },
-  "dependencies": {
-    "@hello-pangea/dnd": "^16.6.0",
-    "@prisma/client": "^5.14.0",
-    "cheerio": "^1.0.0-rc.12",
-    "lucide-react": "^0.378.0",
-    "nanoid": "^5.0.7",
-    "next": "16.2.9",
-    "papaparse": "^5.4.1",
-    "qrcode.react": "^3.1.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "prisma": "^5.14.0",
-    "tailwindcss": "^4",
-    "typescript": "^6.0.3"
+    "turbo": "^2.0.0"
   }
 }
