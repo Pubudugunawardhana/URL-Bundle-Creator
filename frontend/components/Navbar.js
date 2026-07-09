@@ -132,9 +132,9 @@ export default function Navbar() {
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 1rem 0' }}>
                       {session.user?.email}
                     </p>
-                    <button className="btn btn-outline" style={{ borderRadius: '99px', padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
+                    <Link href="/settings" onClick={() => setIsDropdownOpen(false)} className="btn btn-outline" style={{ borderRadius: '99px', padding: '0.4rem 1rem', fontSize: '0.9rem', textDecoration: 'none' }}>
                       Manage your Account
-                    </button>
+                    </Link>
                   </div>
                   
                   <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)', margin: '0 -1.5rem 1rem -1.5rem' }} />
