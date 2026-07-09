@@ -18,7 +18,6 @@ export default function RootLayout({ children }) {
       <body suppressHydrationWarning style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <SessionProvider>
           <Navbar />
-          <ThemeToggle />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {children}
           </div>

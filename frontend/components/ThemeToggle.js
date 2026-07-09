@@ -31,13 +31,9 @@ export default function ThemeToggle() {
       onClick={toggleTheme} 
       className="btn btn-icon glass no-print"
       style={{
-        position: 'fixed',
-        top: '1.5rem',
-        right: '1.5rem',
-        zIndex: 50,
         borderRadius: '50%',
-        width: '45px',
-        height: '45px',
+        width: '40px',
+        height: '40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

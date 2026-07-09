@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { Layers, LayoutDashboard, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { PlaySquare, LogOut, LogIn, UserPlus } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -32,53 +33,70 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="glass no-print" style={{
+    <nav className="no-print" style={{
       position: 'sticky',
-      top: '1rem',
-      left: '1rem',
-      right: '1rem',
-      margin: '1rem auto',
-      maxWidth: '1000px',
+      top: 0,
       zIndex: 40,
-      padding: '0.75rem 1.5rem',
+      padding: '1.5rem 2rem',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      boxShadow: 'var(--glass-shadow)',
+      maxWidth: '1400px',
+      margin: '0 auto',
+      width: '100%',
       transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      transform: visible ? 'translateY(0)' : 'translateY(-150%)',
+      transform: visible ? 'translateY(0)' : 'translateY(-100%)',
       opacity: visible ? 1 : 0,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', color: 'var(--text-primary)', fontWeight: 700, fontSize: '1.2rem' }}>
-          <Layers size={20} color="var(--accent-color)" />
-          <span>URL Bundle Creator</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', color: 'var(--text-primary)' }}>
+          <div className="glass" style={{ padding: '0.5rem', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <PlaySquare size={18} />
+          </div>
+          <span style={{ fontWeight: 600, fontSize: '1.1rem' }}>URL Bundle</span>
         </Link>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: 'auto', marginRight: '4.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <ThemeToggle />
+        
         {status === 'loading' ? (
           <div className="loader" style={{ width: '16px', height: '16px' }} />
         ) : session ? (
           <>
-            <Link href="/dashboard" className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none' }}>
-              <LayoutDashboard size={16} />
-              <span>Dashboard</span>
+            <Link href="/dashboard" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem', borderRadius: '99px', textDecoration: 'none' }}>
+              Dashboard
             </Link>
-            <button onClick={handleSignOut} className="btn btn-danger" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <LogOut size={16} />
-              <span>Sign Out</span>
+            
+            {/* User Avatar with dropdown for logout (simplified for now as click to logout or just avatar) */}
+            <button 
+              onClick={handleSignOut} 
+              title="Sign out"
+              style={{ 
+                width: '40px', 
+                height: '40px', 
+                borderRadius: '50%', 
+                background: '#8b5cf6', 
+                color: 'white', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                fontWeight: 'bold',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '1.1rem'
+              }}
+            >
+              {(session.user?.name?.[0] || session.user?.email?.[0] || 'U').toUpperCase()}
             </button>
           </>
         ) : (
           <>
-            <Link href="/login" className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none' }}>
-              <LogIn size={16} />
-              <span>Log In</span>
+            <Link href="/login" className="btn btn-outline" style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem', borderRadius: '99px', textDecoration: 'none' }}>
+              Log In
             </Link>
-            <Link href="/signup" className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none' }}>
-              <UserPlus size={16} />
-              <span>Sign Up</span>
+            <Link href="/signup" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem', borderRadius: '99px', textDecoration: 'none' }}>
+              Sign Up
             </Link>
           </>
         )}
