@@ -1,0 +1,110 @@
+import { Controller, Post, Get, Delete, Body, Param, Req, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Request } from 'express';
+import { BundlesService } from './bundles.service';
+import { CreateBundleDto } from './dto/create-bundle.dto';
+import { NextAuthGuard } from '../auth/guards/next-auth.guard';
+import * as cookie from 'cookie';
+import { decode } from 'next-auth/jwt';
+
+@Controller('bundles')
+export class BundlesController {
+  constructor(private bundlesService: BundlesService) {}
+
+  @Post()
+  async createBundle(@Body() dto: CreateBundleDto, @Req() req: Request) {
+    if (!dto.name || !dto.links || !Array.isArray(dto.links) || dto.links.length === 0) {
+      throw new HttpException(
+        { error: 'Bundle name and at least one link are required.' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let userId: string | undefined = undefined;
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader) {
+      const cookies = cookie.parse(cookieHeader);
+      const possibleCookies = [
+        'authjs.session-token',
+        '__Secure-authjs.session-token',
+        'next-auth.session-token',
+        '__Secure-next-auth.session-token',
+      ];
+
+      let token = '';
+      let salt = '';
+
+      for (const name of possibleCookies) {
+        if (cookies[name]) {
+          token = cookies[name];
+          salt = name;
+          break;
+        } else if (cookies[`${name}.0`]) {
+          let chunkedToken = '';
+          let i = 0;
+          while (cookies[`${name}.${i}`]) {
+            chunkedToken += cookies[`${name}.${i}`];
+            i++;
+          }
+          token = chunkedToken;
+          salt = name;
+          break;
+        }
+      }
+
+      if (token) {
+        const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+        if (secret) {
+          try {
+            const decoded = await decode({ token, secret, salt });
+            if (decoded) {
+              userId = (decoded.id || decoded.sub) as string;
+            }
+          } catch (error) {
+            // Ignore decryption error for optional authentication
+          }
+        }
+      }
+    }
+
+    return this.bundlesService.create(dto, userId);
+  }
+
+  @UseGuards(NextAuthGuard)
+  @Get()
+  async getUserBundles(@Req() req: any) {
+    const userId = req.user.id || req.user.sub;
+    if (!userId) {
+      throw new HttpException({ error: 'Unauthorized' }, HttpStatus.UNAUTHORIZED);
+    }
+    return this.bundlesService.getUserBundles(userId);
+  }
+
+  @UseGuards(NextAuthGuard)
+  @Delete(':id')
+  async deleteBundle(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user.id || req.user.sub;
+    if (!userId) {
+      throw new HttpException({ error: 'Unauthorized' }, HttpStatus.UNAUTHORIZED);
+    }
+    return this.bundlesService.delete(id, userId);
+  }
+
+  @Get(':id')
+  async getBundle(@Param('id') id: string, @Req() req: Request) {
+    let clientPasswordHash: string | undefined = undefined;
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader) {
+      const cookies = cookie.parse(cookieHeader);
+      clientPasswordHash = cookies[`bundle_pass_${id}`];
+    }
+    return this.bundlesService.findOne(id, clientPasswordHash);
+  }
+
+  @Post(':id/verify-password')
+  async verifyPassword(
+    @Param('id') id: string,
+    @Body() body: { password?: string },
+  ) {
+    return this.bundlesService.verifyPassword(id, body.password);
+  }
+}
