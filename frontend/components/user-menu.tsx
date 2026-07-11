@@ -52,6 +52,7 @@ export function UserMenu() {
         className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shadow-sm hover:shadow-md hover:scale-105 transition-all border-2 border-white dark:border-zinc-900 overflow-hidden"
       >
         {profilePicture ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
         ) : (
           displayInitial
@@ -63,6 +64,7 @@ export function UserMenu() {
           <div className="p-6 flex flex-col items-center border-b border-black/5 dark:border-white/5">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-2xl mb-3 shadow-md border-2 border-white dark:border-zinc-800 relative overflow-hidden">
               {profilePicture ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={profilePicture} alt={name} className="w-full h-full object-cover" />
               ) : (
                 displayInitial
