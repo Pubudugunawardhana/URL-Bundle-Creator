@@ -128,6 +128,9 @@ let BundlesController = class BundlesController {
         }
         return this.bundlesService.delete(id, userId);
     }
+    async getBundleMeta(id) {
+        return this.bundlesService.findMeta(id);
+    }
     async getBundle(id, req) {
         let clientPasswordHash = undefined;
         const cookieHeader = req.headers.cookie;
@@ -184,6 +187,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], BundlesController.prototype, "deleteBundle", null);
+__decorate([
+    (0, common_1.Get)(':id/meta'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], BundlesController.prototype, "getBundleMeta", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
