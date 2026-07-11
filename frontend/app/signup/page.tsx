@@ -8,6 +8,7 @@ import { UserPlus, PlaySquare, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function Register() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,14 +30,29 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name: name.trim() || undefined }),
+      });
       
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || errorData.message || 'Registration failed');
+        let errorMessage = 'Registration failed. Please try again.';
+        try {
+          const errorData = await res.json();
+          if (res.status === 409) {
+            errorMessage = 'An account with this email already exists. Please log in instead.';
+          } else {
+            errorMessage = errorData.error || errorData.message || errorMessage;
+          }
+        } catch {
+          // ignore JSON parse error
+        }
+        setError(errorMessage);
+        return;
       }
 
-      // Try to sign in automatically
+      // Auto sign-in after successful registration
       const signInRes = await signIn('credentials', {
         redirect: false,
         email,
@@ -51,7 +67,7 @@ export default function Register() {
       }
 
     } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -83,7 +99,7 @@ export default function Register() {
             <UserPlus size={26} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2">Create Account</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Start organizing your learning</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Start organizing your URL bundles</p>
         </div>
 
         {error && (
@@ -93,6 +109,16 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Full Name <span className="text-zinc-400 font-normal">(optional)</span></label>
+            <input 
+              type="text" 
+              className="w-full bg-zinc-50 dark:bg-black border border-black/10 dark:border-white/10 text-zinc-900 dark:text-white text-sm rounded-xl px-4 py-3 outline-none focus:border-emerald-500 dark:focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-300 shadow-sm dark:shadow-inner" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+            />
+          </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Email Address</label>
             <input 

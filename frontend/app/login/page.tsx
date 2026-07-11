@@ -29,7 +29,12 @@ export default function Login() {
       });
 
       if (res?.error) {
-        setError(res.error);
+        // Map raw NextAuth error codes to user-friendly messages
+        if (res.error === 'CredentialsSignin' || res.error === 'CallbackRouteError') {
+          setError('Invalid email or password. Please try again.');
+        } else {
+          setError('Login failed. Please try again.');
+        }
       } else {
         router.push('/dashboard');
         router.refresh();
@@ -98,12 +103,7 @@ export default function Login() {
             />
           </div>
           <div className="space-y-1.5 pt-2">
-            <div className="flex justify-between items-center ml-1">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
-              <Link href="/forgot-password" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors">
-                Forgot password?
-              </Link>
-            </div>
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Password</label>
             <div className="relative">
               <input 
                 type={showPassword ? "text" : "password"} 

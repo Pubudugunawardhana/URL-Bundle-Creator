@@ -7,7 +7,9 @@ import FaviconImage from '@/components/FaviconImage';
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const res = await fetch(`http://localhost:3002/api/bundles/${id}`, {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3002';
+  // Use the meta endpoint to avoid incrementing view count during metadata generation
+  const res = await fetch(`${backendUrl}/api/bundles/${id}/meta`, {
     cache: 'no-store'
   }).catch(() => null);
   const bundle = res && res.ok ? await res.json() : null;
@@ -26,7 +28,8 @@ export default async function BundlePage({ params }) {
   const headersList = await headers();
   const cookieHeader = headersList.get('cookie') || '';
 
-  const res = await fetch(`http://localhost:3002/api/bundles/${id}`, {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3002';
+  const res = await fetch(`${backendUrl}/api/bundles/${id}`, {
     headers: {
       cookie: cookieHeader,
     },

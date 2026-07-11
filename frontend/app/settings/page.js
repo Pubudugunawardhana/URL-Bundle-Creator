@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { User, Key, AlertTriangle, Save, Loader2, PlaySquare, ArrowLeft } from 'lucide-react';
@@ -29,12 +29,13 @@ export default function SettingsPage() {
 
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Initialize display name when session loads
-  if (session && !displayName && displayName !== session.user?.name) {
-    setDisplayName(session.user?.name || '');
-  }
+  useEffect(() => {
+    if (session && !displayName && session.user?.name) {
+      setDisplayName(session.user.name);
+    }
+  }, [session]);
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3002';
+
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -42,7 +43,7 @@ export default function SettingsPage() {
     setProfileMessage('');
 
     try {
-      const res = await fetch(`${backendUrl}/api/users/profile`, {
+      const res = await fetch(`/api/users/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: displayName }),
@@ -71,7 +72,7 @@ export default function SettingsPage() {
     setPasswordMessage('');
 
     try {
-      const res = await fetch(`${backendUrl}/api/users/password`, {
+      const res = await fetch(`/api/users/password`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword }),
@@ -98,7 +99,7 @@ export default function SettingsPage() {
 
     setIsDeleting(true);
     try {
-      const res = await fetch(`${backendUrl}/api/users/profile`, {
+      const res = await fetch(`/api/users/profile`, {
         method: 'DELETE',
       });
       
