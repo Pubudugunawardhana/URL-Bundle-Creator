@@ -31,6 +31,7 @@ model Link {
   description String?
   favicon     String?
   note        String?
+  isWatched   Boolean @default(false)
   order       Int     @default(0)
   bundleId    String
   bundle      Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
