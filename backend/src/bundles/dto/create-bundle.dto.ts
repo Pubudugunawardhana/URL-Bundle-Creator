@@ -31,10 +31,10 @@ export class CreateBundleDto {
   description?: string;
 
   @IsArray()
-  @ArrayNotEmpty()
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateLinkDto)
-  links!: CreateLinkDto[];
+  links?: CreateLinkDto[];
 
   @IsString()
   @IsOptional()
