@@ -114,6 +114,13 @@ let BundlesController = class BundlesController {
         }
         return this.bundlesService.getUserBundles(userId);
     }
+    async updateBundle(id, data, req) {
+        const userId = req.user.id || req.user.sub;
+        if (!userId) {
+            throw new common_1.HttpException({ error: 'Unauthorized' }, common_1.HttpStatus.UNAUTHORIZED);
+        }
+        return this.bundlesService.update(id, userId, data);
+    }
     async deleteBundle(id, req) {
         const userId = req.user.id || req.user.sub;
         if (!userId) {
@@ -158,6 +165,16 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BundlesController.prototype, "getUserBundles", null);
+__decorate([
+    (0, common_1.UseGuards)(next_auth_guard_1.NextAuthGuard),
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], BundlesController.prototype, "updateBundle", null);
 __decorate([
     (0, common_1.UseGuards)(next_auth_guard_1.NextAuthGuard),
     (0, common_1.Delete)(':id'),
