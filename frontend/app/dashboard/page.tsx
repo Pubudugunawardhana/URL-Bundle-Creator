@@ -33,28 +33,6 @@ export default function Dashboard() {
   const [newBundleCategory, setNewBundleCategory] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('Folder');
   const [isCreating, setIsCreating] = useState(false);
-  const router = useRouter();
-
-  const fetchBundles = async () => {
-    try {
-      const res = await api.get('/bundles');
-      
-      // Fetch progress for each bundle
-      const bundlesWithProgress = await Promise.all(
-        res.data.map(async (c: Bundle) => {
-          try {
-            const progressRes = await api.get(`/bundles/${c.shortId}/progress`);
-            return { ...c, progress: progressRes.data };
-          } catch {
-            return { ...c, progress: { percentage: 0, totalLinks: 0, watchedLinks: 0 } };
-          }
-        })
-      );
-      
-      setBundles(bundlesWithProgress);
-    } catch (err) {
-      console.error(err);
-    } finally {
       setLoading(false);
     }
   };
