@@ -9,6 +9,7 @@ import { Folder, Plus, Loader2, PlaySquare, ArrowRight, LayoutGrid, X, Heart, Tr
 import { ThemeToggle } from '@/components/theme-toggle';
 import { UserMenu } from '@/components/user-menu';
 import { IconRenderer, ICON_OPTIONS } from '@/lib/icons';
+import { ConfirmModal } from '@/components/confirm-modal';
 
 interface BundleProgress {
   percentage: number;
@@ -33,6 +34,8 @@ export default function Dashboard() {
   const [newBundleCategory, setNewBundleCategory] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('Folder');
   const [isCreating, setIsCreating] = useState(false);
+  const [bundleToDelete, setBundleToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -91,16 +94,24 @@ export default function Dashboard() {
       setIsCreating(false);
     }
   };
-  const handleDeleteBundle = async (e: React.MouseEvent, bundleId: string) => {
+  const handleDeleteBundle = (e: React.MouseEvent, bundleId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm('Are you sure you want to delete this bundle? This cannot be undone.')) return;
+    setBundleToDelete(bundleId);
+  };
+
+  const confirmDeleteBundle = async () => {
+    if (!bundleToDelete) return;
+    setIsDeleting(true);
     try {
-      await api.delete(`/bundles/${bundleId}`);
-      setBundles(bundles.filter(c => c.shortId !== bundleId));
+      await api.delete(`/bundles/${bundleToDelete}`);
+      setBundles(bundles.filter(c => c.shortId !== bundleToDelete));
+      setBundleToDelete(null);
     } catch (err) {
       console.error('Failed to delete bundle', err);
       alert('Failed to delete bundle. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -381,6 +392,17 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={bundleToDelete !== null}
+        onClose={() => !isDeleting && setBundleToDelete(null)}
+        onConfirm={confirmDeleteBundle}
+        title="Delete Bundle"
+        message="Are you sure you want to delete this bundle? This action cannot be undone."
+        confirmText="Delete Bundle"
+        isDestructive={true}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }
