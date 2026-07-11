@@ -182,7 +182,7 @@ export default function LandingPage() {
               </div>
               {/* Address Bar */}
               <div className="flex-1 max-w-lg mx-auto bg-white dark:bg-black/50 rounded-lg py-1.5 px-4 border border-black/5 dark:border-white/10 text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-center font-mono shadow-sm dark:shadow-inner transition-colors duration-300">
-                <span className="text-zinc-400 dark:text-zinc-600 mr-1">https://</span>focustube.app/dashboard
+                <span className="text-zinc-400 dark:text-zinc-600 mr-1">https://</span>urlbundlecreator.app/dashboard
               </div>
             </div>
 

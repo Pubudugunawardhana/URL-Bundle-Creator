@@ -154,6 +154,17 @@ export class BundlesService {
     });
   }
 
+  async findMeta(shortId: string) {
+    const bundle = await this.prisma.bundle.findUnique({
+      where: { shortId },
+      select: { name: true, description: true },
+    });
+    if (!bundle) {
+      throw new HttpException({ error: 'Bundle not found' }, HttpStatus.NOT_FOUND);
+    }
+    return bundle;
+  }
+
   async findOne(shortId: string, clientPasswordHash?: string) {
     const bundle = await this.prisma.bundle.findUnique({
       where: { shortId },

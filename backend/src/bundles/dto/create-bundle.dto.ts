@@ -20,6 +20,9 @@ export class CreateLinkDto {
   @IsString()
   @IsOptional()
   note?: string;
+
+  @IsOptional()
+  isWatched?: boolean;
 }
 
 export class CreateBundleDto {
