@@ -13,6 +13,7 @@ const auth_module_1 = require("./auth/auth.module");
 const bundles_module_1 = require("./bundles/bundles.module");
 const metadata_module_1 = require("./metadata/metadata.module");
 const users_module_1 = require("./users/users.module");
+const app_controller_1 = require("./app.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,5 +26,6 @@ exports.AppModule = AppModule = __decorate([
             metadata_module_1.MetadataModule,
             users_module_1.UsersModule,
         ],
+        controllers: [app_controller_1.AppController],
     })
 ], AppModule);
