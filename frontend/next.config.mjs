@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3002").replace(/\/+$/, '');
+
 const nextConfig = {
   async rewrites() {
     return [
@@ -8,7 +10,7 @@ const nextConfig = {
       },
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3002"}/api/:path*`,
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
