@@ -120,6 +120,14 @@ export default function BundleManager({ initialBundle }) {
     setLinks(links.map(l => l.id === id ? { ...l, [field]: value } : l));
   };
 
+  const toggleWatched = (id) => {
+    setLinks(prev => {
+      const newLinks = prev.map(l => l.id === id ? { ...l, isWatched: !l.isWatched } : l);
+      saveLinks(newLinks);
+      return newLinks;
+    });
+  };
+
   const handleDragEnd = (result) => {
     if (!result.destination) return;
     const items = Array.from(links);
@@ -131,6 +139,9 @@ export default function BundleManager({ initialBundle }) {
 
   // UI Components mapping
   const IconComponent = initialBundle?.icon === 'Rocket' ? Rocket : Folder;
+
+  const watchedCount = links.filter(l => l.isWatched).length;
+  const progressPercentage = links.length > 0 ? Math.round((watchedCount / links.length) * 100) : 0;
 
   return (
     <>
@@ -171,7 +182,7 @@ export default function BundleManager({ initialBundle }) {
                   </div>
                   <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
                     <CheckCircle2 size={16} />
-                    <span>0 Completed</span>
+                    <span>{watchedCount} Completed</span>
                   </div>
                 </div>
               </div>
@@ -225,10 +236,10 @@ export default function BundleManager({ initialBundle }) {
           <div className="flex flex-col gap-3">
             <div className="flex justify-between items-center text-sm font-semibold">
               <span className="text-zinc-500 dark:text-zinc-400">Collection Progress</span>
-              <span className="text-zinc-900 dark:text-white">0%</span>
+              <span className="text-zinc-900 dark:text-white">{progressPercentage}%</span>
             </div>
             <div className="w-full h-3 bg-zinc-100 dark:bg-zinc-900 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: '0%' }}></div>
+              <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out" style={{ width: `${progressPercentage}%` }}></div>
             </div>
           </div>
         </div>
@@ -351,6 +362,13 @@ export default function BundleManager({ initialBundle }) {
                                 )}
 
                                 <div className="flex gap-2 mt-1">
+                                  <button 
+                                    className={`border transition-all flex items-center gap-1.5 font-medium rounded-lg px-3 py-1 text-xs ${link.isWatched ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-white dark:bg-black/50 border-black/10 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'}`}
+                                    onClick={() => toggleWatched(link.id)}
+                                  >
+                                    <CheckCircle2 size={14} className={link.isWatched ? "fill-current" : ""} />
+                                    {link.isWatched ? 'Watched' : 'Mark as Watched'}
+                                  </button>
                                   <button 
                                     className="bg-white dark:bg-black/50 border border-black/10 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium rounded-lg px-3 py-1 text-xs transition-all" 
                                     onClick={() => updateLink(link.id, 'isEditing', true)}
