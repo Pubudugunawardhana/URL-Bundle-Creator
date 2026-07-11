@@ -68,3 +68,13 @@ __decorate([
     (0, class_validator_1.IsIn)(['1h', '24h', '7d']),
     __metadata("design:type", String)
 ], CreateBundleDto.prototype, "expiresIn", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateBundleDto.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateBundleDto.prototype, "icon", void 0);

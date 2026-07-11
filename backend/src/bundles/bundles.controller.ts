@@ -81,6 +81,20 @@ export class BundlesController {
   }
 
   @UseGuards(NextAuthGuard)
+  @Put(':id')
+  async updateBundle(
+    @Param('id') id: string,
+    @Body() data: any,
+    @Req() req: any
+  ) {
+    const userId = req.user.id || req.user.sub;
+    if (!userId) {
+      throw new HttpException({ error: 'Unauthorized' }, HttpStatus.UNAUTHORIZED);
+    }
+    return this.bundlesService.update(id, userId, data);
+  }
+
+  @UseGuards(NextAuthGuard)
   @Delete(':id')
   async deleteBundle(@Param('id') id: string, @Req() req: any) {
     const userId = req.user.id || req.user.sub;
