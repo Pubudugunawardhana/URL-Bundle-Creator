@@ -142,7 +142,6 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
     }
   };
 
-
   return (
     <>
       {toast.show && (
@@ -152,21 +151,20 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
           onClose={() => setToast({ ...toast, show: false })} 
         />
       )}
-      <div className="glass animate-fade-in" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '700px', margin: '0 auto', textAlign: 'left' }}>
+      <div className="bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-xl animate-fade-in flex flex-col gap-8 w-full max-w-3xl mx-auto text-left">
       
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1.5rem' }}>
+      <div className="flex items-center gap-4 pb-6 border-b border-black/10 dark:border-white/10">
         <button 
-          className="btn btn-icon" 
+          className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors text-zinc-600 dark:text-zinc-400" 
           onClick={() => {
             if (onCancel) onCancel();
           }}
           title="Go back"
-          style={{ padding: '0.5rem', background: 'var(--hover-bg)' }}
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={24} />
         </button>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white m-0">
           {mode === 'create' ? 'Create Bundle' : 'Add Links'}
         </h2>
       </div>
@@ -174,44 +172,44 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
       {/* Bundle Meta info (Create Mode) */}
       {mode === 'create' && (
         <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="flex flex-col gap-6">
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Bundle Name <span style={{ color: 'var(--danger-color)' }}>*</span></label>
+              <label className="block mb-2 font-medium text-zinc-700 dark:text-zinc-300">Bundle Name <span className="text-rose-500">*</span></label>
               <input 
                 type="text" 
                 placeholder="e.g. Frontend Resources" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                style={{ fontSize: '1.2rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: name.trim() ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
+                className={`w-full bg-zinc-50 dark:bg-black border ${name.trim() ? 'border-black/10 dark:border-white/10' : 'border-rose-500/50'} text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-lg`}
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Description</label>
+              <label className="block mb-2 font-medium text-zinc-700 dark:text-zinc-300">Description</label>
               <textarea 
                 placeholder="What are these links for?" 
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                style={{ padding: '1rem', background: 'var(--input-bg-dark)', resize: 'vertical' }}
+                className="w-full bg-zinc-50 dark:bg-black border border-black/10 dark:border-white/10 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all resize-y"
               />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Password (Optional)</label>
+                <label className="block mb-2 font-medium text-zinc-700 dark:text-zinc-300">Password (Optional)</label>
                 <input 
                   type="password" 
                   placeholder="Protect this bundle" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)' }}
+                  className="w-full bg-zinc-50 dark:bg-black border border-black/10 dark:border-white/10 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Self-Destruct (Optional)</label>
+                <label className="block mb-2 font-medium text-zinc-700 dark:text-zinc-300">Self-Destruct (Optional)</label>
                 <select
                   value={expiresIn}
                   onChange={(e) => setExpiresIn(e.target.value)}
-                  style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)', color: 'var(--text-primary)', width: '100%', borderRadius: '8px', cursor: 'pointer' }}
+                  className="w-full bg-zinc-50 dark:bg-black border border-black/10 dark:border-white/10 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-pointer"
                 >
                   <option value="none">Never</option>
                   <option value="1h">1 Hour</option>
@@ -222,34 +220,33 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
             </div>
             
             {password && (
-              <div className="animate-fade-in" style={{ marginTop: '-0.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Confirm Password <span style={{ color: 'var(--danger-color)' }}>*</span></label>
+              <div className="animate-fade-in -mt-2">
+                <label className="block mb-2 font-medium text-zinc-700 dark:text-zinc-300">Confirm Password <span className="text-rose-500">*</span></label>
                 <input 
                   type="password" 
                   placeholder="Type your password again" 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: confirmPassword === password ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
+                  className={`w-full bg-zinc-50 dark:bg-black border ${confirmPassword === password ? 'border-black/10 dark:border-white/10' : 'border-rose-500/50'} text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all`}
                 />
               </div>
             )}
           </div>
           
-          <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)', margin: '1rem 0' }} />
+          <hr className="border-t border-black/10 dark:border-white/10 my-4" />
           
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+          <div className="flex justify-end gap-4">
             {onCancel && (
-              <button className="btn btn-outline" onClick={onCancel} style={{ padding: '1rem 2rem' }}>
+              <button className="bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl px-6 py-3 shadow-sm transition-all" onClick={onCancel}>
                 Cancel
               </button>
             )}
             <button 
-              className="btn btn-primary" 
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl px-8 py-3 shadow-md flex items-center justify-center gap-2 transition-all disabled:opacity-70" 
               onClick={handleSave} 
               disabled={isSaving}
-              style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
             >
-              {isSaving ? <Loader2 className="loader" /> : 'Create Bundle \u2192'}
+              {isSaving ? <Loader2 className="animate-spin" size={20} /> : 'Create Bundle \u2192'}
             </button>
           </div>
         </>
@@ -258,15 +255,14 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
       {/* Links Section (Edit Mode) */}
       {mode === 'edit' && (
         <>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--text-primary)', fontWeight: 600 }}>Add Links</h3>
-        <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)', marginBottom: '1.5rem' }} />
+          <div className="flex flex-col">
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">Add Links</h3>
+            <hr className="border-t border-black/10 dark:border-white/10 mb-6" />
         
         {/* Top Add Link Button */}
         <button 
-          className="btn btn-outline" 
+          className="w-full bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-medium rounded-xl p-4 flex items-center justify-center gap-2 transition-colors mb-6" 
           onClick={handleAddNewLink}
-          style={{ width: '100%', padding: '1rem', borderStyle: 'dashed', marginBottom: '1.5rem' }}
         >
           <Plus size={20}/> Add Link
         </button>
@@ -278,7 +274,7 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
               <div 
                 {...provided.droppableProps} 
                 ref={provided.innerRef}
-                style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+                className="flex flex-col gap-6"
               >
                 {links.map((link, index) => (
                   <Draggable key={link.id} draggableId={link.id} index={index}>
@@ -286,33 +282,25 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className="glass"
-                        style={{ 
-                          ...provided.draggableProps.style,
-                          padding: '1.5rem',
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '1.25rem',
-                          background: 'var(--input-bg-dark)',
-                          border: '1px solid var(--card-border)'
-                        }}
+                        className="bg-white dark:bg-zinc-950 border border-black/10 dark:border-white/10 rounded-2xl p-6 shadow-md flex items-start gap-4 transition-all"
+                        style={{ ...provided.draggableProps.style }}
                       >
-                        <div {...provided.dragHandleProps} style={{ padding: '0.5rem', color: 'var(--text-secondary)', cursor: 'grab', marginTop: link.isEditing ? '0.5rem' : '0' }}>
+                        <div {...provided.dragHandleProps} className={`p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 cursor-grab ${link.isEditing ? 'mt-2' : 'mt-0'}`}>
                           <GripVertical size={20} />
                         </div>
 
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="flex-1 flex flex-col gap-4">
                           
                           {link.isEditing ? (
                             // --- EDIT MODE ---
                             <>
                               {/* URL Input */}
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--hover-bg)', padding: '0.5rem 1rem', borderRadius: '8px', border: !link.url.trim() ? '1px solid rgba(239, 68, 68, 0.5)' : '1px solid transparent' }}>
+                              <div className={`flex items-center gap-3 bg-zinc-50 dark:bg-black border ${!link.url.trim() ? 'border-rose-500/50' : 'border-black/5 dark:border-white/5'} rounded-xl p-3 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 transition-all`}>
                                 {link.favicon ? (
                                   // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={link.favicon} alt="" style={{ width: 20, height: 20, borderRadius: 4 }} onError={(e) => { e.target.style.display='none'; }} />
+                                  <img src={link.favicon} alt="" className="w-5 h-5 rounded" onError={(e) => { e.target.style.display='none'; }} />
                                 ) : (
-                                  <LinkIcon size={20} color="var(--text-secondary)" />
+                                  <LinkIcon size={20} className="text-zinc-400" />
                                 )}
                                 <input 
                                   type="text" 
@@ -320,9 +308,9 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
                                   value={link.url}
                                   onChange={(e) => updateLink(link.id, 'url', e.target.value)}
                                   onBlur={(e) => handleUrlBlur(link.id, e.target.value)}
-                                  style={{ border: 'none', background: 'transparent', padding: 0, fontSize: '1rem' }}
+                                  className="w-full bg-transparent border-none outline-none text-zinc-900 dark:text-white"
                                 />
-                                {isFetching && <Loader2 size={16} className="loader" style={{ marginLeft: 'auto' }} />}
+                                {isFetching && <Loader2 size={16} className="animate-spin text-emerald-500 ml-auto" />}
                               </div>
 
                               {/* Title Input */}
@@ -332,7 +320,7 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
                                   placeholder="Title (e.g. React Documentation)" 
                                   value={link.title}
                                   onChange={(e) => updateLink(link.id, 'title', e.target.value)}
-                                  style={{ background: 'transparent', border: '1px solid var(--card-border)' }}
+                                  className="w-full bg-zinc-50 dark:bg-black border border-black/10 dark:border-white/10 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                                 />
                               </div>
 
@@ -343,22 +331,21 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
                                   placeholder="Description (e.g. Official React docs)" 
                                   value={link.note || link.description}
                                   onChange={(e) => updateLink(link.id, 'note', e.target.value)}
-                                  style={{ background: 'transparent', border: '1px solid var(--card-border)' }}
+                                  className="w-full bg-zinc-50 dark:bg-black border border-black/10 dark:border-white/10 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                                 />
                               </div>
 
                               {/* Actions */}
-                              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                              <div className="flex gap-3 mt-2">
                                 <button 
-                                  className="btn btn-primary" 
+                                  className="bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-black font-semibold rounded-lg px-6 py-2 transition-colors" 
                                   onClick={() => updateLink(link.id, 'isEditing', false)}
-                                  style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
                                 >
                                   Done
                                 </button>
                                 <button 
                                   type="button" 
-                                  className="btn-icon btn-danger" 
+                                  className="text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 p-2 rounded-lg transition-colors flex items-center justify-center" 
                                   onClick={() => removeLink(link.id)} 
                                   title="Remove Link"
                                 >
@@ -370,43 +357,41 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
                             // --- VIEW MODE ---
                             <>
                               {/* Title & Favicon */}
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                              <div className="flex items-center gap-3">
                                 {link.favicon ? (
                                   // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={link.favicon} alt="" style={{ width: 24, height: 24, borderRadius: 4 }} onError={(e) => { e.target.style.display='none'; }} />
+                                  <img src={link.favicon} alt="" className="w-6 h-6 rounded" onError={(e) => { e.target.style.display='none'; }} />
                                 ) : (
-                                  <LinkIcon size={24} color="var(--text-secondary)" />
+                                  <LinkIcon size={24} className="text-zinc-400" />
                                 )}
-                                <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                                <h4 className="m-0 text-xl font-bold text-zinc-900 dark:text-white truncate">
                                   {link.title || link.url}
                                 </h4>
                               </div>
 
                               {/* URL */}
-                              <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', fontSize: '0.95rem', textDecoration: 'none', wordBreak: 'break-all' }}>
+                              <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 text-sm no-underline break-all hover:underline">
                                 {link.url}
                               </a>
 
                               {/* Description */}
                               {(link.note || link.description) && (
-                                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                                <p className="m-0 text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">
                                   {link.note || link.description}
                                 </p>
                               )}
 
                               {/* Actions */}
-                              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                              <div className="flex gap-3 mt-2">
                                 <button 
-                                  className="btn btn-outline" 
+                                  className="bg-white dark:bg-black/50 border border-black/10 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium rounded-lg px-4 py-1.5 text-sm transition-all" 
                                   onClick={() => updateLink(link.id, 'isEditing', true)}
-                                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
                                 >
                                   Edit
                                 </button>
                                 <button 
-                                  className="btn btn-outline" 
+                                  className="bg-white dark:bg-black/50 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-medium rounded-lg px-4 py-1.5 text-sm transition-all" 
                                   onClick={() => removeLink(link.id)}
-                                  style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', color: 'var(--danger-color)', borderColor: 'rgba(239, 68, 68, 0.3)' }}
                                 >
                                   Delete
                                 </button>
@@ -425,32 +410,30 @@ export default function BundleEditor({ mode = 'create', initialBundle = null, on
           </Droppable>
         </DragDropContext>
 
-        {/* Bottom Add Link Button (only show if there are links) */}
+        {/* Bottom Add Link Button */}
         {links.length > 0 && (
           <button 
-            className="btn btn-outline" 
+            className="w-full bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-medium rounded-xl p-4 flex items-center justify-center gap-2 transition-colors mt-6" 
             onClick={handleAddNewLink}
-            style={{ width: '100%', padding: '1rem', borderStyle: 'dashed', marginTop: '1.5rem' }}
           >
             <Plus size={20}/> Add Link
           </button>
         )}
           </div>
-          <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)' }} />
+          <hr className="border-t border-black/10 dark:border-white/10 my-6" />
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+          <div className="flex justify-end gap-4">
             {onCancel && (
-              <button className="btn btn-outline" onClick={onCancel} style={{ padding: '1rem 2rem' }}>
+              <button className="bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl px-6 py-3 shadow-sm transition-all" onClick={onCancel}>
                 &larr; Back
               </button>
             )}
             <button 
-              className="btn btn-primary" 
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl px-8 py-3 shadow-md flex items-center justify-center gap-2 transition-all flex-1 md:flex-none disabled:opacity-70" 
               onClick={handleSave} 
               disabled={isSaving}
-              style={{ fontSize: '1.2rem', padding: '1rem 2rem', flex: 1 }}
             >
-              {isSaving ? <Loader2 className="loader" /> : 'Finish & Generate Bundle'}
+              {isSaving ? <Loader2 className="animate-spin" size={20} /> : 'Finish & Generate Bundle'}
             </button>
           </div>
         </>
