@@ -25,7 +25,7 @@ interface Bundle {
   progress?: BundleProgress;
 }
 
-export default function Dashboard() {
+export default function FavoritesDashboard() {
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -39,9 +39,11 @@ export default function Dashboard() {
   const fetchBundles = async () => {
     try {
       const res = await api.get('/bundles');
-      const bundlesWithProgress = res.data.map((c) => {
+      const bundlesWithProgress = res.data
+        .filter((c: any) => c.isFavorite)
+        .map((c: any) => {
         const totalLinks = c.links ? c.links.length : 0;
-        const watchedLinks = c.links ? c.links.filter(l => l.isWatched).length : 0;
+        const watchedLinks = c.links ? c.links.filter((l: any) => l.isWatched).length : 0;
         const percentage = totalLinks > 0 ? Math.round((watchedLinks / totalLinks) * 100) : 0;
         return { 
           ...c, 
@@ -96,19 +98,18 @@ export default function Dashboard() {
     e.preventDefault();
     e.stopPropagation();
     
-    // Optimistic UI update
-    setBundles(bundles.map(c => 
-      c.shortId === bundleId ? { ...c, isFavorite: !currentStatus } : c
-    ));
+    // Store original in case of failure
+    const originalBundles = [...bundles];
+    
+    // Optimistic UI update - remove from favorites view
+    setBundles(bundles.filter(c => c.shortId !== bundleId));
     
     try {
-      await api.put(`/bundles/${bundleId}`, { isFavorite: !currentStatus } )
+      await api.put(`/bundles/${bundleId}`, { isFavorite: false } )
     } catch (err) {
       console.error('Failed to toggle favorite', err);
       // Revert on failure
-      setBundles(bundles.map(c => 
-        c.shortId === bundleId ? { ...c, isFavorite: currentStatus } : c
-      ));
+      setBundles(originalBundles);
     }
   };
 
@@ -161,10 +162,10 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-2">
-              <LayoutGrid size={24} className="text-emerald-500" />
-              Your Bundles
+              <Heart size={24} className="text-rose-500 fill-current" />
+              Favourite Bundles
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Organize and track your YouTube tutorials</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Quick access to your most important collections</p>
           </div>
           <button 
             onClick={() => setShowModal(true)} 
@@ -176,17 +177,17 @@ export default function Dashboard() {
 
         {bundles.length === 0 ? (
           <div className="w-full bg-white dark:bg-black/50 border border-black/10 dark:border-white/10 rounded-3xl p-12 shadow-xl flex flex-col items-center justify-center backdrop-blur-xl transition-colors duration-300 min-h-[400px]">
-            <div className="w-20 h-20 rounded-3xl bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/5 flex items-center justify-center mb-6 shadow-inner">
-              <Folder size={32} className="text-zinc-400 dark:text-zinc-500" />
+            <div className="w-20 h-20 rounded-3xl bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 flex items-center justify-center mb-6 shadow-inner">
+              <Heart size={32} className="text-rose-400 dark:text-rose-500" />
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2">No bundles yet</h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm text-center">Create your first bundle to start organizing your YouTube links and tracking your learning progress.</p>
-            <button 
-              onClick={() => setShowModal(true)} 
+            <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2">No favourites yet</h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm text-center">Click the heart icon on any bundle to add it to your favourites for quick access.</p>
+            <Link 
+              href="/dashboard" 
               className="bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 text-sm font-semibold rounded-xl px-6 py-3 transition-all flex items-center justify-center gap-2 shadow-md"
             >
-              <Plus size={16} /> Create First Bundle
-            </button>
+              <LayoutGrid size={16} /> Browse All Bundles
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
