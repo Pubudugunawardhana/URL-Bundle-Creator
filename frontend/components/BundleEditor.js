@@ -4,13 +4,13 @@ import { GripVertical, Trash2, Link as LinkIcon, Plus, Loader2, ArrowLeft, Edit3
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Toast from './Toast';
 
-export default function BundleEditor({ onSave, onCancel }) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+export default function BundleEditor({ mode = 'create', initialBundle = null, onSave, onCancel }) {
+  const [name, setName] = useState(initialBundle?.name || '');
+  const [description, setDescription] = useState(initialBundle?.description || '');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [expiresIn, setExpiresIn] = useState('none');
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState(initialBundle?.links || []);
   const [isFetching, setIsFetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
@@ -86,43 +86,62 @@ export default function BundleEditor({ onSave, onCancel }) {
   };
 
   const handleSave = async () => {
-    if (!name.trim()) {
-      showToast("Please enter a Bundle Name.");
-      return;
-    }
-    if (links.length === 0) {
-      showToast("Please add at least one link.");
-      return;
-    }
-    const validLinks = links.filter(l => l.url && l.url.trim() !== '').map(({ isEditing, ...rest }) => rest);
-    if (validLinks.length === 0) {
-      showToast("Please make sure your links have valid URLs.");
-      return;
-    }
-    if (password && password !== confirmPassword) {
-      showToast("Passwords do not match. Please check your password and try again.");
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const res = await fetch('/api/bundles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description, password, expiresIn, links: validLinks })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        onSave(data);
-      } else {
-        showToast(data.error || 'Failed to save bundle.');
+    if (mode === 'create') {
+      if (!name.trim()) {
+        showToast("Please enter a Bundle Name.");
+        return;
       }
-    } catch (e) {
-      showToast('Error saving bundle. Please try again.');
-    } finally {
-      setIsSaving(false);
+      if (password && password !== confirmPassword) {
+        showToast("Passwords do not match. Please check your password and try again.");
+        return;
+      }
+
+      setIsSaving(true);
+      try {
+        const res = await fetch('/api/bundles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description, password, expiresIn, links: [] })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          onSave(data);
+        } else {
+          showToast(data.error || 'Failed to save bundle.');
+        }
+      } catch (e) {
+        showToast('Error saving bundle. Please try again.');
+      } finally {
+        setIsSaving(false);
+      }
+    } else if (mode === 'edit') {
+      const validLinks = links.filter(l => l.url && l.url.trim() !== '').map(({ isEditing, ...rest }) => rest);
+      if (validLinks.length === 0) {
+        showToast("Please add at least one valid link.");
+        return;
+      }
+
+      setIsSaving(true);
+      try {
+        const res = await fetch(`/api/bundles/${initialBundle.shortId}/links`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ links: validLinks })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          onSave(data);
+        } else {
+          showToast(data.error || 'Failed to update links.');
+        }
+      } catch (e) {
+        showToast('Error updating links. Please try again.');
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
+
 
   return (
     <>
@@ -137,83 +156,110 @@ export default function BundleEditor({ onSave, onCancel }) {
       
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: '1px solid var(--card-border)', paddingBottom: '1.5rem' }}>
-        {onCancel && (
-          <button 
-            className="btn btn-icon" 
-            onClick={onCancel}
-            title="Go back"
-            style={{ padding: '0.5rem', background: 'var(--hover-bg)' }}
-          >
-            <ArrowLeft size={20} />
-          </button>
-        )}
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>URL Bundle Creator</h2>
+        <button 
+          className="btn btn-icon" 
+          onClick={() => {
+            if (onCancel) onCancel();
+          }}
+          title="Go back"
+          style={{ padding: '0.5rem', background: 'var(--hover-bg)' }}
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>
+          {mode === 'create' ? 'Create Bundle' : 'Add Links'}
+        </h2>
       </div>
 
-      {/* Bundle Meta info */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Bundle Name <span style={{ color: 'var(--danger-color)' }}>*</span></label>
-          <input 
-            type="text" 
-            placeholder="e.g. Frontend Resources" 
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ fontSize: '1.2rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: name.trim() ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
-          />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Description</label>
-          <textarea 
-            placeholder="What are these links for?" 
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            style={{ padding: '1rem', background: 'var(--input-bg-dark)', resize: 'vertical' }}
-          />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Password (Optional)</label>
-            <input 
-              type="password" 
-              placeholder="Protect this bundle" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)' }}
-            />
+      {/* Bundle Meta info (Create Mode) */}
+      {mode === 'create' && (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Bundle Name <span style={{ color: 'var(--danger-color)' }}>*</span></label>
+              <input 
+                type="text" 
+                placeholder="e.g. Frontend Resources" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                style={{ fontSize: '1.2rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: name.trim() ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Description</label>
+              <textarea 
+                placeholder="What are these links for?" 
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                style={{ padding: '1rem', background: 'var(--input-bg-dark)', resize: 'vertical' }}
+              />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Password (Optional)</label>
+                <input 
+                  type="password" 
+                  placeholder="Protect this bundle" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Self-Destruct (Optional)</label>
+                <select
+                  value={expiresIn}
+                  onChange={(e) => setExpiresIn(e.target.value)}
+                  style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)', color: 'var(--text-primary)', width: '100%', borderRadius: '8px', cursor: 'pointer' }}
+                >
+                  <option value="none">Never</option>
+                  <option value="1h">1 Hour</option>
+                  <option value="24h">24 Hours</option>
+                  <option value="7d">7 Days</option>
+                </select>
+              </div>
+            </div>
+            
+            {password && (
+              <div className="animate-fade-in" style={{ marginTop: '-0.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Confirm Password <span style={{ color: 'var(--danger-color)' }}>*</span></label>
+                <input 
+                  type="password" 
+                  placeholder="Type your password again" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: confirmPassword === password ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
+                />
+              </div>
+            )}
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Self-Destruct (Optional)</label>
-            <select
-              value={expiresIn}
-              onChange={(e) => setExpiresIn(e.target.value)}
-              style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: 'var(--card-border)', color: 'var(--text-primary)', width: '100%', borderRadius: '8px', cursor: 'pointer' }}
+          
+          <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)', margin: '1rem 0' }} />
+          
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+            {onCancel && (
+              <button className="btn btn-outline" onClick={onCancel} style={{ padding: '1rem 2rem' }}>
+                Cancel
+              </button>
+            )}
+            <button 
+              className="btn btn-primary" 
+              onClick={handleSave} 
+              disabled={isSaving}
+              style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
             >
-              <option value="none">Never</option>
-              <option value="1h">1 Hour</option>
-              <option value="24h">24 Hours</option>
-              <option value="7d">7 Days</option>
-            </select>
+              {isSaving ? <Loader2 className="loader" /> : 'Create Bundle \u2192'}
+            </button>
           </div>
-        </div>
-        
-        {password && (
-          <div className="animate-fade-in" style={{ marginTop: '-0.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Confirm Password <span style={{ color: 'var(--danger-color)' }}>*</span></label>
-            <input 
-              type="password" 
-              placeholder="Type your password again" 
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              style={{ fontSize: '1rem', padding: '1rem', background: 'var(--input-bg-dark)', borderColor: confirmPassword === password ? 'var(--card-border)' : 'rgba(239, 68, 68, 0.5)' }}
-            />
-          </div>
-        )}
-      </div>
+        </>
+      )}
 
-      <div style={{ marginTop: '1rem' }}>
-        <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--text-primary)', fontWeight: 600 }}>Links</h3>
+      {/* Links Section (Edit Mode) */}
+      {mode === 'edit' && (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--text-primary)', fontWeight: 600 }}>Add Links</h3>
         <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)', marginBottom: '1.5rem' }} />
         
         {/* Top Add Link Button */}
@@ -389,20 +435,26 @@ export default function BundleEditor({ onSave, onCancel }) {
             <Plus size={20}/> Add Link
           </button>
         )}
-      </div>
+          </div>
+          <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)' }} />
 
-      <hr style={{ border: 'none', borderTop: '1px solid var(--card-border)' }} />
-
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button 
-          className="btn btn-primary" 
-          onClick={handleSave} 
-          disabled={isSaving}
-          style={{ fontSize: '1.2rem', padding: '1rem 2rem', width: '100%' }}
-        >
-          {isSaving ? <Loader2 className="loader" /> : 'Generate Bundle'}
-        </button>
-      </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+            {onCancel && (
+              <button className="btn btn-outline" onClick={onCancel} style={{ padding: '1rem 2rem' }}>
+                &larr; Back
+              </button>
+            )}
+            <button 
+              className="btn btn-primary" 
+              onClick={handleSave} 
+              disabled={isSaving}
+              style={{ fontSize: '1.2rem', padding: '1rem 2rem', flex: 1 }}
+            >
+              {isSaving ? <Loader2 className="loader" /> : 'Finish & Generate Bundle'}
+            </button>
+          </div>
+        </>
+      )}
     </div>
     </>
   );
