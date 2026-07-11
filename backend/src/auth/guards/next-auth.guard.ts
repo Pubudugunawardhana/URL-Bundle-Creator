@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { decode } from 'next-auth/jwt';
 import * as cookie from 'cookie';
 
 @Injectable()
@@ -51,6 +50,8 @@ export class NextAuthGuard implements CanActivate {
     }
 
     try {
+      // Use dynamic import to fix ERR_REQUIRE_ESM error on Vercel
+      const { decode } = await eval('import("next-auth/jwt")');
       const decoded = await decode({
         token,
         secret,

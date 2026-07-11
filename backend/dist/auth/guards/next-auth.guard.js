@@ -41,7 +41,6 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NextAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_1 = require("next-auth/jwt");
 const cookie = __importStar(require("cookie"));
 let NextAuthGuard = class NextAuthGuard {
     async canActivate(context) {
@@ -85,7 +84,8 @@ let NextAuthGuard = class NextAuthGuard {
             throw new common_1.UnauthorizedException('Auth secret not configured');
         }
         try {
-            const decoded = await (0, jwt_1.decode)({
+            const { decode } = await eval('import("next-auth/jwt")');
+            const decoded = await decode({
                 token,
                 secret,
                 salt,
