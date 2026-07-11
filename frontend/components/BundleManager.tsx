@@ -16,6 +16,7 @@ export default function BundleManager({ initialBundle }) {
   const router = useRouter();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -248,7 +249,7 @@ export default function BundleManager({ initialBundle }) {
         <div className="w-full mt-2">
           {links.length === 0 && (
             <div className="text-center py-12 text-zinc-500 dark:text-zinc-400 bg-white/50 dark:bg-zinc-950/50 rounded-[32px] border border-dashed border-zinc-300 dark:border-zinc-700">
-              No links added yet. Click "Add Link" to get started.
+              No links added yet. Click &quot;Add Link&quot; to get started.
             </div>
           )}
 
@@ -282,7 +283,7 @@ export default function BundleManager({ initialBundle }) {
                                 <div className={`flex items-center gap-3 bg-zinc-50 dark:bg-black border ${!link.url.trim() ? 'border-rose-500/50' : 'border-black/5 dark:border-white/5'} rounded-xl p-3 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 transition-all`}>
                                   {link.favicon ? (
                                     // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={link.favicon} alt="" className="w-5 h-5 rounded" onError={(e) => { e.target.style.display='none'; }} />
+                                    <img src={link.favicon} alt="" className="w-5 h-5 rounded" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display='none'; }} />
                                   ) : (
                                     <LinkIcon size={20} className="text-zinc-400" />
                                   )}
@@ -340,7 +341,7 @@ export default function BundleManager({ initialBundle }) {
                                 <div className="flex items-center gap-2.5">
                                   {link.favicon ? (
                                     // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={link.favicon} alt="" className="w-6 h-6 rounded-md shadow-sm" onError={(e) => { e.target.style.display='none'; }} />
+                                    <img src={link.favicon} alt="" className="w-6 h-6 rounded-md shadow-sm" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display='none'; }} />
                                   ) : (
                                     <div className="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
                                       <LinkIcon size={14} className="text-zinc-500" />
@@ -367,7 +368,7 @@ export default function BundleManager({ initialBundle }) {
                                     onClick={() => toggleWatched(link.id)}
                                   >
                                     <CheckCircle2 size={14} className={link.isWatched ? "fill-current" : ""} />
-                                    {link.isWatched ? 'Watched' : 'Mark as Watched'}
+                                    {link.isWatched ? 'Visited' : 'Mark as Visited'}
                                   </button>
                                   <button 
                                     className="bg-white dark:bg-black/50 border border-black/10 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium rounded-lg px-3 py-1 text-xs transition-all" 
