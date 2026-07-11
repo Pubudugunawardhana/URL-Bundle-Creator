@@ -43,4 +43,12 @@ export class CreateBundleDto {
   @IsOptional()
   @IsIn(['1h', '24h', '7d'])
   expiresIn?: '1h' | '24h' | '7d';
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsString()
+  @IsOptional()
+  icon?: string;
 }

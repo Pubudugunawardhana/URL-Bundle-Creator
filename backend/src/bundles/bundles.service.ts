@@ -31,6 +31,8 @@ export class BundlesService {
         shortId,
         name: dto.name,
         description: dto.description || null,
+        category: dto.category || null,
+        icon: dto.icon || 'Folder',
         password: hashedPassword,
         expiresAt,
         userId: userId || null,
@@ -126,6 +128,27 @@ export class BundlesService {
         },
       },
       include: { links: true },
+    });
+  }
+
+  async update(shortId: string, userId: string, data: any) {
+    const bundle = await this.prisma.bundle.findUnique({
+      where: { shortId },
+    });
+
+    if (!bundle) {
+      throw new HttpException({ error: 'Bundle not found' }, HttpStatus.NOT_FOUND);
+    }
+
+    if (bundle.userId !== userId) {
+      throw new HttpException({ error: 'Unauthorized: You do not own this bundle' }, HttpStatus.FORBIDDEN);
+    }
+
+    return this.prisma.bundle.update({
+      where: { shortId },
+      data: {
+        isFavorite: data.isFavorite,
+      },
     });
   }
 
