@@ -39,6 +39,10 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateLinkDto.prototype, "note", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateLinkDto.prototype, "isWatched", void 0);
 class CreateBundleDto {
 }
 exports.CreateBundleDto = CreateBundleDto;

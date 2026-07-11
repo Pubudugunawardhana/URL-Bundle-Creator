@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import api from '@/lib/axios';
 import Link from 'next/link';
-import { Folder, Plus, Loader2, PlaySquare, ArrowRight, LayoutGrid, X, Heart } from 'lucide-react';
+import { Folder, Plus, Loader2, PlaySquare, ArrowRight, LayoutGrid, X, Heart, Trash2, Link2, BarChart2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { UserMenu } from '@/components/user-menu';
 import { IconRenderer, ICON_OPTIONS } from '@/lib/icons';
@@ -13,7 +13,7 @@ import { IconRenderer, ICON_OPTIONS } from '@/lib/icons';
 interface BundleProgress {
   percentage: number;
   totalLinks: number;
-  watchedLinks: number;
+  visitedLinks: number;
 }
 
 interface Bundle {
@@ -41,11 +41,11 @@ export default function Dashboard() {
       const res = await api.get('/bundles');
       const bundlesWithProgress = res.data.map((c) => {
         const totalLinks = c.links ? c.links.length : 0;
-        const watchedLinks = c.links ? c.links.filter(l => l.isWatched).length : 0;
-        const percentage = totalLinks > 0 ? Math.round((watchedLinks / totalLinks) * 100) : 0;
+        const visitedLinks = c.links ? c.links.filter(l => l.isWatched).length : 0;
+        const percentage = totalLinks > 0 ? Math.round((visitedLinks / totalLinks) * 100) : 0;
         return { 
           ...c, 
-          progress: { percentage, totalLinks, watchedLinks } 
+          progress: { percentage, totalLinks, visitedLinks } 
         };
       });
       setBundles(bundlesWithProgress);
@@ -89,6 +89,18 @@ export default function Dashboard() {
       console.error(err);
     } finally {
       setIsCreating(false);
+    }
+  };
+  const handleDeleteBundle = async (e: React.MouseEvent, bundleId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm('Are you sure you want to delete this bundle? This cannot be undone.')) return;
+    try {
+      await api.delete(`/bundles/${bundleId}`);
+      setBundles(bundles.filter(c => c.shortId !== bundleId));
+    } catch (err) {
+      console.error('Failed to delete bundle', err);
+      alert('Failed to delete bundle. Please try again.');
     }
   };
 
@@ -139,7 +151,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="font-bold text-lg tracking-tight text-zinc-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">URL Bundle Creator</h1>
-              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider group-hover:text-emerald-500/70 transition-colors">Learning Hub</p>
+              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider group-hover:text-emerald-500/70 transition-colors">Bundle Manager</p>
             </div>
           </Link>
 
@@ -164,7 +176,7 @@ export default function Dashboard() {
               <LayoutGrid size={24} className="text-emerald-500" />
               Your Bundles
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Organize and track your YouTube tutorials</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Organize and manage your URL collections</p>
           </div>
           <button 
             onClick={() => setShowModal(true)} 
@@ -174,13 +186,46 @@ export default function Dashboard() {
           </button>
         </div>
 
+        {/* Stats Panel */}
+        {bundles.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div className="bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-2xl p-5 shadow-sm backdrop-blur-xl flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                <Folder size={20} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">{bundles.length}</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Total Bundles</p>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-2xl p-5 shadow-sm backdrop-blur-xl flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <Link2 size={20} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">{bundles.reduce((acc, b) => acc + (b.progress?.totalLinks || 0), 0)}</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Total Links</p>
+              </div>
+            </div>
+            <div className="bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-2xl p-5 shadow-sm backdrop-blur-xl flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                <BarChart2 size={20} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">{bundles.reduce((acc, b) => acc + (b.progress?.visitedLinks || 0), 0)}</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Links Visited</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {bundles.length === 0 ? (
           <div className="w-full bg-white dark:bg-black/50 border border-black/10 dark:border-white/10 rounded-3xl p-12 shadow-xl flex flex-col items-center justify-center backdrop-blur-xl transition-colors duration-300 min-h-[400px]">
             <div className="w-20 h-20 rounded-3xl bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/5 flex items-center justify-center mb-6 shadow-inner">
               <Folder size={32} className="text-zinc-400 dark:text-zinc-500" />
             </div>
             <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2">No bundles yet</h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm text-center">Create your first bundle to start organizing your YouTube links and tracking your learning progress.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm text-center">Create your first bundle to start organizing your links and sharing them as a collection.</p>
             <button 
               onClick={() => setShowModal(true)} 
               className="bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 text-sm font-semibold rounded-xl px-6 py-3 transition-all flex items-center justify-center gap-2 shadow-md"
@@ -200,12 +245,21 @@ export default function Dashboard() {
                     <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/5 flex items-center justify-center mb-1 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/10 transition-colors">
                       <IconRenderer iconName={c.icon || 'Folder'} size={22} className="text-zinc-600 dark:text-zinc-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
                     </div>
-                    <button 
-                      onClick={(e) => handleToggleFavorite(e, c.shortId, !!c.isFavorite)}
-                      className={`p-2 rounded-full transition-colors ${c.isFavorite ? 'text-rose-500 bg-rose-50 dark:bg-rose-500/10' : 'text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'}`}
-                    >
-                      <Heart size={20} className={c.isFavorite ? 'fill-current' : ''} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={(e) => handleToggleFavorite(e, c.shortId, !!c.isFavorite)}
+                        className={`p-2 rounded-full transition-colors ${c.isFavorite ? 'text-rose-500 bg-rose-50 dark:bg-rose-500/10' : 'text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'}`}
+                      >
+                        <Heart size={20} className={c.isFavorite ? 'fill-current' : ''} />
+                      </button>
+                      <button 
+                        onClick={(e) => handleDeleteBundle(e, c.shortId)}
+                        className="p-2 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                        title="Delete bundle"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                   
                   <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-1 truncate" title={c.name}>{c.name}</h3>
@@ -233,8 +287,8 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                      <PlaySquare size={13} />
-                      <span>{c.progress?.watchedLinks || 0} of {c.progress?.totalLinks || 0} links watched</span>
+                      <Link2 size={13} />
+                      <span>{c.progress?.visitedLinks || 0} of {c.progress?.totalLinks || 0} links visited</span>
                     </div>
                   </div>
                 </div>

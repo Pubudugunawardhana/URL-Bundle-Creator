@@ -104,6 +104,11 @@ export class BundlesController {
     return this.bundlesService.delete(id, userId);
   }
 
+  @Get(':id/meta')
+  async getBundleMeta(@Param('id') id: string) {
+    return this.bundlesService.findMeta(id);
+  }
+
   @Get(':id')
   async getBundle(@Param('id') id: string, @Req() req: Request) {
     let clientPasswordHash: string | undefined = undefined;
