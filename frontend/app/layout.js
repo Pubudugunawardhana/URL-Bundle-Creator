@@ -4,6 +4,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { SessionProvider } from 'next-auth/react';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata = {
   title: 'URL Bundle Creator | Share multiple links with one link',
@@ -13,16 +14,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-      </head>
       <body suppressHydrationWarning style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <SessionProvider>
-          <Navbar />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProvider>
             {children}
-          </div>
-          <Footer />
-        </SessionProvider>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
