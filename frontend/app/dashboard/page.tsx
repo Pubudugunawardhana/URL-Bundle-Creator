@@ -33,21 +33,39 @@ export default function Dashboard() {
   const [newBundleCategory, setNewBundleCategory] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('Folder');
   const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  const fetchBundles = async () => {
+    try {
+      const res = await api.get('/bundles');
+      const bundlesWithProgress = res.data.map((c) => {
+        const totalLinks = c.links ? c.links.length : 0;
+        return { 
+          ...c, 
+          progress: { percentage: 0, totalLinks, watchedLinks: 0 } 
+        };
+      });
+      setBundles(bundlesWithProgress);
+    } catch (err) {
+      console.error(err);
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const token = true;
-    if (!token) {
+    if (status === 'unauthenticated') {
       router.push('/login');
       return;
     }
-    const timer = setTimeout(() => {
-      fetchBundles();
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [router]);
+    if (status === 'authenticated') {
+      const timer = setTimeout(() => {
+        fetchBundles();
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [status, router]);
 
   const handleCreateBundle = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,7 +189,7 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {bundles.map(c => (
-              <Link href={`/bundles/${c.shortId}`} key={c.shortId} className="group outline-none">
+              <Link href={`/edit/${c.shortId}`} key={c.shortId} className="group outline-none">
                 <div className="h-full bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-2xl p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500/30 dark:hover:border-emerald-500/30 transition-all duration-300 backdrop-blur-xl flex flex-col relative overflow-hidden">
                   {/* Subtle top highlight on hover */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
