@@ -52,7 +52,6 @@ const create_bundle_dto_1 = require("./dto/create-bundle.dto");
 const update_links_dto_1 = require("./dto/update-links.dto");
 const next_auth_guard_1 = require("../auth/guards/next-auth.guard");
 const cookie = __importStar(require("cookie"));
-const jwt_1 = require("next-auth/jwt");
 let BundlesController = class BundlesController {
     constructor(bundlesService) {
         this.bundlesService = bundlesService;
@@ -95,7 +94,8 @@ let BundlesController = class BundlesController {
                 const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
                 if (secret) {
                     try {
-                        const decoded = await (0, jwt_1.decode)({ token, secret, salt });
+                        const { decode } = await eval('import("next-auth/jwt")');
+                        const decoded = await decode({ token, secret, salt });
                         if (decoded) {
                             userId = (decoded.id || decoded.sub);
                         }

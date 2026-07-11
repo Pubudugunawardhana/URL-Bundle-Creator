@@ -5,7 +5,6 @@ import { CreateBundleDto } from './dto/create-bundle.dto';
 import { UpdateLinksDto } from './dto/update-links.dto';
 import { NextAuthGuard } from '../auth/guards/next-auth.guard';
 import * as cookie from 'cookie';
-import { decode } from 'next-auth/jwt';
 
 @Controller('bundles')
 export class BundlesController {
@@ -56,6 +55,7 @@ export class BundlesController {
         const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
         if (secret) {
           try {
+            const { decode } = await eval('import("next-auth/jwt")');
             const decoded = await decode({ token, secret, salt });
             if (decoded) {
               userId = (decoded.id || decoded.sub) as string;
