@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Rocket, Trash2, Link as LinkIcon, Plus, Loader2, Edit3, Heart, LayoutList, LayoutGrid, CheckCircle2, PlayCircle, Folder, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Toast from './Toast';
+import { ConfirmModal } from '@/components/confirm-modal';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 
@@ -13,6 +14,7 @@ export default function BundleManager({ initialBundle }) {
   const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
   const [viewMode, setViewMode] = useState('list');
   const [mounted, setMounted] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function BundleManager({ initialBundle }) {
   };
 
   const handleDeleteBundle = async () => {
-    if (!confirm('Are you sure you want to delete this bundle? This action cannot be undone.')) return;
+    setIsDeleteModalOpen(false);
     try {
       await api.delete(`/bundles/${initialBundle.shortId}`);
       router.push('/dashboard');
@@ -222,7 +224,7 @@ export default function BundleManager({ initialBundle }) {
                 <span>Add Link</span>
               </button>
               <button 
-                onClick={handleDeleteBundle}
+                onClick={() => setIsDeleteModalOpen(true)}
                 className="flex items-center justify-center p-2.5 rounded-xl border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-rose-500 transition-colors"
                 title="Delete Bundle"
               >
@@ -399,6 +401,15 @@ export default function BundleManager({ initialBundle }) {
           )}
         </div>
       </div>
+      <ConfirmModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteBundle}
+        title="Delete Bundle"
+        message="Are you sure you want to delete this bundle? This action cannot be undone."
+        confirmText="Delete Bundle"
+        isDestructive={true}
+      />
     </>
   );
 }

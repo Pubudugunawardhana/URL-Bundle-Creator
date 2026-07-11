@@ -7,6 +7,7 @@ import { User, Key, AlertTriangle, Save, Loader2, PlaySquare, ArrowLeft } from '
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { UserMenu } from '@/components/user-menu';
+import { ConfirmModal } from '@/components/confirm-modal';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function SettingsPage() {
   const [passwordMessage, setPasswordMessage] = useState('');
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     if (session && !displayName && session.user?.name) {
@@ -93,10 +95,7 @@ export default function SettingsPage() {
   };
 
   const handleDeleteProfile = async () => {
-    if (!window.confirm("Are you absolutely sure? This will delete your account and all your bundles forever.")) {
-      return;
-    }
-
+    setIsDeleteModalOpen(false);
     setIsDeleting(true);
     try {
       const res = await fetch(`/api/users/profile`, {
@@ -314,7 +313,7 @@ export default function SettingsPage() {
               </p>
               
               <button 
-                onClick={handleDeleteProfile} 
+                onClick={() => setIsDeleteModalOpen(true)} 
                 disabled={isDeleting} 
                 className="bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-70 text-sm font-semibold rounded-xl px-6 py-3 transition-all flex items-center justify-center gap-2 shadow-md"
               >
@@ -355,6 +354,17 @@ export default function SettingsPage() {
           
         </div>
       </main>
+
+      <ConfirmModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteProfile}
+        title="Delete Account"
+        message="Are you absolutely sure? This will delete your account and all your bundles forever. This action cannot be undone."
+        confirmText="Delete Account"
+        cancelText="Keep Account"
+        isDestructive={true}
+      />
     </div>
   );
 }
