@@ -1,7 +1,8 @@
-import { Controller, Post, Get, Delete, Body, Param, Req, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Param, Req, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { Request } from 'express';
 import { BundlesService } from './bundles.service';
 import { CreateBundleDto } from './dto/create-bundle.dto';
+import { UpdateLinksDto } from './dto/update-links.dto';
 import { NextAuthGuard } from '../auth/guards/next-auth.guard';
 import * as cookie from 'cookie';
 import { decode } from 'next-auth/jwt';
@@ -12,9 +13,9 @@ export class BundlesController {
 
   @Post()
   async createBundle(@Body() dto: CreateBundleDto, @Req() req: Request) {
-    if (!dto.name || !dto.links || !Array.isArray(dto.links) || dto.links.length === 0) {
+    if (!dto.name) {
       throw new HttpException(
-        { error: 'Bundle name and at least one link are required.' },
+        { error: 'Bundle name is required.' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -106,5 +107,15 @@ export class BundlesController {
     @Body() body: { password?: string },
   ) {
     return this.bundlesService.verifyPassword(id, body.password);
+  }
+
+  @UseGuards(NextAuthGuard)
+  @Put(':id/links')
+  async updateLinks(@Param('id') id: string, @Body() dto: UpdateLinksDto, @Req() req: any) {
+    const userId = req.user.id || req.user.sub;
+    if (!userId) {
+      throw new HttpException({ error: 'Unauthorized' }, HttpStatus.UNAUTHORIZED);
+    }
+    return this.bundlesService.updateLinks(id, userId, dto.links);
   }
 }

@@ -49,6 +49,7 @@ exports.BundlesController = void 0;
 const common_1 = require("@nestjs/common");
 const bundles_service_1 = require("./bundles.service");
 const create_bundle_dto_1 = require("./dto/create-bundle.dto");
+const update_links_dto_1 = require("./dto/update-links.dto");
 const next_auth_guard_1 = require("../auth/guards/next-auth.guard");
 const cookie = __importStar(require("cookie"));
 const jwt_1 = require("next-auth/jwt");
@@ -57,8 +58,8 @@ let BundlesController = class BundlesController {
         this.bundlesService = bundlesService;
     }
     async createBundle(dto, req) {
-        if (!dto.name || !dto.links || !Array.isArray(dto.links) || dto.links.length === 0) {
-            throw new common_1.HttpException({ error: 'Bundle name and at least one link are required.' }, common_1.HttpStatus.BAD_REQUEST);
+        if (!dto.name) {
+            throw new common_1.HttpException({ error: 'Bundle name is required.' }, common_1.HttpStatus.BAD_REQUEST);
         }
         let userId = undefined;
         const cookieHeader = req.headers.cookie;
@@ -132,6 +133,13 @@ let BundlesController = class BundlesController {
     async verifyPassword(id, body) {
         return this.bundlesService.verifyPassword(id, body.password);
     }
+    async updateLinks(id, dto, req) {
+        const userId = req.user.id || req.user.sub;
+        if (!userId) {
+            throw new common_1.HttpException({ error: 'Unauthorized' }, common_1.HttpStatus.UNAUTHORIZED);
+        }
+        return this.bundlesService.updateLinks(id, userId, dto.links);
+    }
 };
 exports.BundlesController = BundlesController;
 __decorate([
@@ -175,6 +183,16 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], BundlesController.prototype, "verifyPassword", null);
+__decorate([
+    (0, common_1.UseGuards)(next_auth_guard_1.NextAuthGuard),
+    (0, common_1.Put)(':id/links'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_links_dto_1.UpdateLinksDto, Object]),
+    __metadata("design:returntype", Promise)
+], BundlesController.prototype, "updateLinks", null);
 exports.BundlesController = BundlesController = __decorate([
     (0, common_1.Controller)('bundles'),
     __metadata("design:paramtypes", [bundles_service_1.BundlesService])

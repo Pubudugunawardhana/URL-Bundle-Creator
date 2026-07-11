@@ -77,7 +77,7 @@ let BundlesService = class BundlesService {
                 expiresAt,
                 userId: userId || null,
                 links: {
-                    create: dto.links.map((link, index) => ({
+                    create: (dto.links || []).map((link, index) => ({
                         url: link.url,
                         title: link.title || null,
                         description: link.description || null,
@@ -120,6 +120,36 @@ let BundlesService = class BundlesService {
         catch (error) {
             throw new common_1.HttpException({ error: 'Failed to delete bundle' }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    async updateLinks(shortId, userId, links) {
+        const bundle = await this.prisma.bundle.findUnique({
+            where: { shortId },
+        });
+        if (!bundle) {
+            throw new common_1.HttpException({ error: 'Bundle not found' }, common_1.HttpStatus.NOT_FOUND);
+        }
+        if (bundle.userId !== userId) {
+            throw new common_1.HttpException({ error: 'Unauthorized: You do not own this bundle' }, common_1.HttpStatus.FORBIDDEN);
+        }
+        await this.prisma.link.deleteMany({
+            where: { bundleId: bundle.id },
+        });
+        return this.prisma.bundle.update({
+            where: { shortId },
+            data: {
+                links: {
+                    create: links.map((link, index) => ({
+                        url: link.url,
+                        title: link.title || null,
+                        description: link.description || null,
+                        favicon: link.favicon || null,
+                        note: link.note || null,
+                        order: index,
+                    })),
+                },
+            },
+            include: { links: true },
+        });
     }
     async findOne(shortId, clientPasswordHash) {
         const bundle = await this.prisma.bundle.findUnique({
