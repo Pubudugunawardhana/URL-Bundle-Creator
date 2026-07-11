@@ -14,6 +14,9 @@ model Bundle {
   description String?
   password    String?
   expiresAt   DateTime?
+  category    String?
+  icon        String?  @default("Folder")
+  isFavorite  Boolean  @default(false)
   links       Link[]
   createdAt   DateTime @default(now())
   views       Int      @default(0)
