@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/play-square.svg" alt="URL Bundle Creator Logo" width="80" height="80">
   <h1 align="center">URL Bundle Creator</h1>
   <p align="center">
     A beautiful, modern application to organize, share, and track progress on collections of URLs.
