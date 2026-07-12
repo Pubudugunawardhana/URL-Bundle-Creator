@@ -55,7 +55,9 @@ export class BundlesController {
         const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
         if (secret) {
           try {
-            const { decode } = await eval('import("next-auth/jwt")');
+            require.resolve('next-auth/jwt');
+            const dynamicImport = new Function('specifier', 'return import(specifier)');
+            const { decode } = await dynamicImport('next-auth/jwt');
             const decoded = await decode({ token, secret, salt });
             if (decoded) {
               userId = (decoded.id || decoded.sub) as string;

@@ -50,8 +50,11 @@ export class NextAuthGuard implements CanActivate {
     }
 
     try {
-      // Use dynamic import to fix ERR_REQUIRE_ESM error on Vercel
-      const { decode } = await eval('import("next-auth/jwt")');
+      // Force Vercel to include the package without throwing ERR_REQUIRE_ESM
+      require.resolve('next-auth/jwt');
+      // Bypass Vercel's aggressive transpilation of import() to require()
+      const dynamicImport = new Function('specifier', 'return import(specifier)');
+      const { decode } = await dynamicImport('next-auth/jwt');
       const decoded = await decode({
         token,
         secret,
