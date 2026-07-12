@@ -84,7 +84,9 @@ let NextAuthGuard = class NextAuthGuard {
             throw new common_1.UnauthorizedException('Auth secret not configured');
         }
         try {
-            const { decode } = await eval('import("next-auth/jwt")');
+            require.resolve('next-auth/jwt');
+            const dynamicImport = new Function('specifier', 'return import(specifier)');
+            const { decode } = await dynamicImport('next-auth/jwt');
             const decoded = await decode({
                 token,
                 secret,
